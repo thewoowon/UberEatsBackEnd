@@ -1,9 +1,13 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
 export class Restaurant{
+
+    @Field(type => Number)
+    @PrimaryGeneratedColumn()
+    id:number
 
     @Field(type => String)
     @Column()
@@ -20,4 +24,9 @@ export class Restaurant{
     @Field(type => String)
     @Column()
     ownerName:string;
+
+    @Field(type => String)
+    @Column()
+    categoryName:string;
+
 }
