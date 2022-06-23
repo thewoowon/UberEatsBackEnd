@@ -15,6 +15,7 @@ const restaurants_module_1 = require("./restaurants/restaurants.module");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
 const Joi = require("joi");
+const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -25,7 +26,12 @@ AppModule = __decorate([
                 envFilePath: process.env.NODE_ENV === 'dev' ? '.env.dev' : '.env.test',
                 ignoreEnvFile: process.env.NODE_ENV === 'prod',
                 validationSchema: Joi.object({
-                    NODE_ENV: Joi.string().valid('dev', 'prod')
+                    NODE_ENV: Joi.string().valid('dev', 'prod').required(),
+                    DB_HOST: Joi.string().required(),
+                    DB_PORT: Joi.string().required(),
+                    DB_USERNAME: Joi.string().required(),
+                    DB_PASSWORD: Joi.string().required(),
+                    DB_NAME: Joi.string().required(),
                 })
             }),
             graphql_1.GraphQLModule.forRoot({
@@ -41,6 +47,7 @@ AppModule = __decorate([
                 database: process.env.DB_NAME,
                 synchronize: true,
                 logging: true,
+                entities: [restaurant_entity_1.Restaurant]
             }),
             restaurants_module_1.RestaurantsModule,
         ],
