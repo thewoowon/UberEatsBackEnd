@@ -12,14 +12,30 @@ const graphql_1 = require("@nestjs/graphql");
 const apollo_1 = require("@nestjs/apollo");
 const path_1 = require("path");
 const restaurants_module_1 = require("./restaurants/restaurants.module");
+const typeorm_1 = require("@nestjs/typeorm");
+const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: process.env.NODE_ENV === "dev" ? ".dev.env" : ".test.env",
+            }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
+            }),
+            typeorm_1.TypeOrmModule.forRoot({
+                type: "postgres",
+                host: "localhost",
+                port: 5432,
+                username: "woowon",
+                password: "Ww940706!!",
+                database: "uber-eats",
+                synchronize: true,
+                logging: true,
             }),
             restaurants_module_1.RestaurantsModule,
         ],
