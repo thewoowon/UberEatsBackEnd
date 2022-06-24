@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity';
       entities:[Restaurant]
     }),
     RestaurantsModule,
+    UsersModule,
   ],
   controllers: [],
   providers: [],

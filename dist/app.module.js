@@ -16,6 +16,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
 const Joi = require("joi");
 const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
+const users_module_1 = require("./users/users.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -50,6 +51,7 @@ AppModule = __decorate([
                 entities: [restaurant_entity_1.Restaurant]
             }),
             restaurants_module_1.RestaurantsModule,
+            users_module_1.UsersModule,
         ],
         controllers: [],
         providers: [],
