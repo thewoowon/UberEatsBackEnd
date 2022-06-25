@@ -15,7 +15,7 @@ enum UserRole {
 }
 
 type CreateAccountOutput {
-  erro: String
+  error: String
   ok: Boolean!
 }
 

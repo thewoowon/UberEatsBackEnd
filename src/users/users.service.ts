@@ -15,7 +15,7 @@ export class UsersService{
         return this.users.find()
     }
 
-    async createAccount({email,password,role}:CreateAccountInput){
+    async createAccount({email,password,role}: CreateAccountInput):Promise<{ok:boolean,error?:string}>{
         try{
             const exists = await this.users.findOne({
                 select:{
@@ -26,17 +26,24 @@ export class UsersService{
                 }    
             });
             if(exists)
-                return
+                return {
+                    ok:false,
+                    error:"There is already a Accout that have same email"
+                };
             await this.users.save(this.users.create({
                 email:email,
                 password:password,
                 role:role
-            }))
+            }));
+            return {
+                ok:true,
+            };
         }catch(e){
-            
+            console.log(e);
+            return {
+                ok:false,
+                error:"Couldn't Make a Account from your request"
+            };
         }
-
-        return ;
     }
-
 }
