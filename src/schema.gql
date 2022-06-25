@@ -19,16 +19,28 @@ type CreateAccountOutput {
   ok: Boolean!
 }
 
+type LoginOutput {
+  error: String
+  ok: Boolean!
+  token: String
+}
+
 type Query {
   users: [User!]!
 }
 
 type Mutation {
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
+  login(input: LoginInput!): LoginOutput!
 }
 
 input CreateAccountInput {
   email: String!
   password: String!
   role: UserRole!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
 }
