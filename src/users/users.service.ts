@@ -7,12 +7,14 @@ import { LoginInput } from "./dtos/login.dto";
 import { User } from "./entities/user.entity";
 import * as Jwt from "jsonwebtoken";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "src/jwt/jwt.service";
 
 @Injectable()
 export class UsersService{
     constructor(
         @InjectRepository(User) private readonly users:Repository<User>,
         private readonly config:ConfigService,
+        private readonly jwtService:JwtService,
     ){}
 
     usersAll():Promise<User[]>{

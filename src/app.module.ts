@@ -26,7 +26,7 @@ import { JwtModule } from './jwt/jwt.module';
         DB_USERNAME:Joi.string().required(),
         DB_PASSWORD:Joi.string().required(),
         DB_NAME:Joi.string().required(),
-        SECRET_KEY:Joi.string().required(),
+        PRIVATE_KEY:Joi.string().required(),
       })
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -46,7 +46,9 @@ import { JwtModule } from './jwt/jwt.module';
     }),
     UsersModule,
     CommonModule,
-    JwtModule,
+    JwtModule.forRoot({
+      privateKey:process.env.PRIVATE_KEY
+    }),
   ],
   controllers: [],
   providers: [],
