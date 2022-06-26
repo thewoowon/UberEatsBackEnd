@@ -80,9 +80,10 @@ export class UsersService{
                     error:"Wrong Password"
                 }
             // make a JWT and giv it to the user
+            const token = this.jwtService.sign({id:user.id});
             return {
                 ok:true,
-                token:Jwt.sign({id:user.id},this.config.get('SECRET_KEY'))
+                token:token,
             }
         }
         catch(e){
