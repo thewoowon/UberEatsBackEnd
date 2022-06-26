@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Query } from "@nestjs/common";
+import { Global, Injectable, InternalServerErrorException, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { exist } from "joi";
 import { Repository } from "typeorm";
@@ -62,6 +62,7 @@ export class UsersService{
                 select:{
                     email:true,
                     password:true,
+                    id:true,
                 },
                 where:{
                     email:email
@@ -80,7 +81,7 @@ export class UsersService{
                     error:"Wrong Password"
                 }
             // make a JWT and giv it to the user
-            const token = this.jwtService.sign({id:user.id});
+            const token = this.jwtService.sign({id:user.id,email:user.email});
             return {
                 ok:true,
                 token:token,
@@ -92,5 +93,16 @@ export class UsersService{
         }
     }
 
-
+    async findById(id:number):Promise<User>{
+        return this.users.findOne({
+            select:{
+                email:true,
+                password:true,
+                id:true,
+            },
+            where:{
+                id:id
+            }
+        })
+    }
 }
