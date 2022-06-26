@@ -3,6 +3,7 @@
 # ------------------------------------------------------
 
 type User {
+  id: Float!
   email: String!
   password: String!
   role: UserRole!
@@ -28,6 +29,7 @@ type LoginOutput {
 type Query {
   users: [User!]!
   me: User!
+  user(userId: Float!): User!
 }
 
 type Mutation {

@@ -99,6 +99,7 @@ export class UsersService{
                 email:true,
                 password:true,
                 id:true,
+                role:true,
             },
             where:{
                 id:id

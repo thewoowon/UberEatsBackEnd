@@ -6,6 +6,8 @@ import { LoginInput, LoginOutput } from "./dtos/login.dto";
 import { query } from "express";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "src/auth/auth.guard";
+import { AuthUser } from "src/auth/auth-user.decorator";
+import { UseProfileInput } from "./dtos/user-profile.dto";
 
 @Resolver(of => User)
 export class UsersResolver{
@@ -51,5 +53,14 @@ export class UsersResolver{
 
     @Query(returns=>User)
     @UseGuards(AuthGuard)
-    me(){ }
+    me(@AuthUser() authUser:User){
+        return authUser
+    }
+    
+    @UseGuards(AuthGuard)
+    @Query(returns=>User)
+    user(@Args() userProfileInput:UseProfileInput){
+        return this.usersService.findById(userProfileInput.userId);
+    }
+
 }
