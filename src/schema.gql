@@ -33,15 +33,27 @@ type LoginOutput {
   token: String
 }
 
+type UserProfileOutput {
+  error: String
+  ok: Boolean!
+  user: User
+}
+
+type EditProfileOutput {
+  error: String
+  ok: Boolean!
+}
+
 type Query {
   users: [User!]!
   me: User!
-  userProfile(userId: Float!): User!
+  userProfile(userId: Float!): UserProfileOutput!
 }
 
 type Mutation {
   createAccount(input: CreateAccountInput!): CreateAccountOutput!
   login(input: LoginInput!): LoginOutput!
+  editProfile(input: EditProfileInput!): EditProfileOutput!
 }
 
 input CreateAccountInput {
@@ -53,4 +65,9 @@ input CreateAccountInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input EditProfileInput {
+  email: String
+  password: String
 }

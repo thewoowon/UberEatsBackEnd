@@ -11,6 +11,6 @@ export class UseProfileInput{
 @ObjectType()
 export class UserProfileOutput extends CoreOutput{
 
-    @Field(type => User)
-    user:User;
+    @Field(type => User,{nullable:true})
+    user?:User;
 }

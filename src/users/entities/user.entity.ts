@@ -1,5 +1,5 @@
 import { CoreEntity } from "src/common/entities/core.entity";
-import { BeforeInsert, Column, Entity } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { Field, InputType, ObjectType, registerEnumType } from "@nestjs/graphql";
 import * as bcrypt from "bcrypt";
 import { InternalServerErrorException } from "@nestjs/common";
@@ -31,7 +31,7 @@ export class User extends CoreEntity{
     @IsEnum(UserRole)
     role:UserRole;
 
-
+    @BeforeUpdate()
     @BeforeInsert()
     async hashPassword() : Promise<void>{
         try{
@@ -48,7 +48,6 @@ export class User extends CoreEntity{
             const ok = await bcrypt.compare(aPassword,this.password);
             return ok;
         }catch(e){
-            console.log(e);
             throw new InternalServerErrorException();
         }
     }

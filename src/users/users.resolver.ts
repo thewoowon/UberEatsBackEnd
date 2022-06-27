@@ -7,7 +7,8 @@ import { query } from "express";
 import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "src/auth/auth.guard";
 import { AuthUser } from "src/auth/auth-user.decorator";
-import { UseProfileInput } from "./dtos/user-profile.dto";
+import { UseProfileInput, UserProfileOutput } from "./dtos/user-profile.dto";
+import { EditProfileInput, EditProfileOutput } from "./dtos/edit-profile.dto";
 
 @Resolver(of => User)
 export class UsersResolver{
@@ -58,9 +59,42 @@ export class UsersResolver{
     }
     
     @UseGuards(AuthGuard)
-    @Query(returns=>User)
-    userProfile(@Args() userProfileInput:UseProfileInput){
-        return this.usersService.findById(userProfileInput.userId);
+    @Query(returns=>UserProfileOutput)
+    async userProfile(@Args() userProfileInput:UseProfileInput):Promise<UserProfileOutput>{
+        try{
+            const user  = await this.usersService.findById(userProfileInput.userId);
+            if(!user)
+            {
+                throw Error();
+            }
+            return {
+                ok:true,
+                user:user
+            }
+        }
+        catch(e)
+        {
+            return {
+                error:'User Not Found',
+                ok:false
+            }
+        }
     }
 
+    @UseGuards(AuthGuard)
+    @Mutation(returns => EditProfileOutput)
+    async editProfile(@AuthUser() authUser:User, @Args('input') EditProfileInput:EditProfileInput):Promise<EditProfileOutput>{
+        try{
+            await this.usersService.editProfile(authUser.id,EditProfileInput);
+            return {
+                ok:true,
+            }
+        }
+        catch(e){
+            return{
+                ok:false,
+                error:e,
+            }
+        }
+    }
 }
