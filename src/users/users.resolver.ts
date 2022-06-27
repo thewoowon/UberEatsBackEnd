@@ -59,7 +59,7 @@ export class UsersResolver{
     
     @UseGuards(AuthGuard)
     @Query(returns=>User)
-    user(@Args() userProfileInput:UseProfileInput){
+    userProfile(@Args() userProfileInput:UseProfileInput){
         return this.usersService.findById(userProfileInput.userId);
     }
 

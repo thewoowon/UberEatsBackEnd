@@ -4,10 +4,17 @@
 
 type User {
   id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   email: String!
   password: String!
   role: UserRole!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 enum UserRole {
   Client
@@ -29,7 +36,7 @@ type LoginOutput {
 type Query {
   users: [User!]!
   me: User!
-  user(userId: Float!): User!
+  userProfile(userId: Float!): User!
 }
 
 type Mutation {
