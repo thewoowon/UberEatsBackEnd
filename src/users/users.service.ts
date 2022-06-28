@@ -1,7 +1,7 @@
 import { Global, Injectable, InternalServerErrorException, Query } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { exist } from "joi";
-import { Repository } from "typeorm";
+import { exist, object } from "joi";
+import { RelationId, Repository } from "typeorm";
 import { CreateAccountInput, CreateAccountOutput } from "./dtos/create-account.dto";
 import { LoginInput } from "./dtos/login.dto";
 import { User } from "./entities/user.entity";
@@ -45,7 +45,6 @@ export class UsersService{
             }));
             // 여기에 이메일 인증 기능이 들어간다.
             await this.verifications.save(this.verifications.create({
-                code:"1234567890",
                 user:user
             }))
 
@@ -130,11 +129,28 @@ export class UsersService{
         if(email)
         {
             user.email = email;
+            user.verified= false;
+            await this.verifications.save(this.verifications.create({user:user}));
         }
         if(password)
         {
             user.password = password;
         }
         return await this.users.save(user);
+    }
+
+    async verifyEmail(code:string):Promise<boolean>{
+        const verification = await this.verifications.findOne({
+            relations:['user'],
+            where:{
+                code:code
+            },
+        })
+
+        if(verification)
+        {
+            console.log(verification);
+        }
+        return false;
     }
 }
