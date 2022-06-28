@@ -9,12 +9,13 @@ import * as Jwt from "jsonwebtoken";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "src/jwt/jwt.service";
 import { EditProfileInput } from "./dtos/edit-profile.dto";
+import { Verification } from "./entities/verification.entity";
 
 @Injectable()
 export class UsersService{
     constructor(
         @InjectRepository(User) private readonly users:Repository<User>,
-        private readonly config:ConfigService,
+        @InjectRepository(Verification) private readonly verifications:Repository<Verification>,
         private readonly jwtService:JwtService,
     ){}
 
@@ -37,11 +38,17 @@ export class UsersService{
                     ok:false,
                     error:"There is already a Accout that have same email"
                 };
-            await this.users.save(this.users.create({
+            const user =  await this.users.save(this.users.create({
                 email:email,
                 password:password,
                 role:role
             }));
+            // 여기에 이메일 인증 기능이 들어간다.
+            await this.verifications.save(this.verifications.create({
+                code:"1234567890",
+                user:user
+            }))
+
             return {
                 ok:true,
             };
