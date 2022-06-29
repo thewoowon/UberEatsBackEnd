@@ -19,6 +19,7 @@ const user_entity_1 = require("./users/entities/user.entity");
 const jwt_module_1 = require("./jwt/jwt.module");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
 const verification_entity_1 = require("./users/entities/verification.entity");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
@@ -64,6 +65,7 @@ AppModule = __decorate([
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIVATE_KEY
             }),
+            mail_module_1.MailModule,
         ],
         controllers: [],
         providers: [],

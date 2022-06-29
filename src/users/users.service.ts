@@ -151,7 +151,8 @@ export class UsersService{
             if(verification)
             {
                 verification.user.verified = true;
-                this.users.save(verification.user);
+                await this.users.save(verification.user);
+                await this.verifications.delete(verification.id);
                 return true;
             }
             throw new Error();
