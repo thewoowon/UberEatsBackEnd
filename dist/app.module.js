@@ -43,6 +43,9 @@ AppModule = __decorate([
                     DB_PASSWORD: Joi.string().required(),
                     DB_NAME: Joi.string().required(),
                     PRIVATE_KEY: Joi.string().required(),
+                    MAILGUN_API_KEY: Joi.string().required(),
+                    MAILGUN_DOMAIN_NAME: Joi.string().required(),
+                    MAILGUN_FROM_EMAIL: Joi.string().required(),
                 })
             }),
             graphql_1.GraphQLModule.forRoot({
@@ -65,7 +68,11 @@ AppModule = __decorate([
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIVATE_KEY
             }),
-            mail_module_1.MailModule,
+            mail_module_1.MailModule.forRoot({
+                apiKey: process.env.MAILGUN_API_KEY,
+                domain: process.env.MAILGUN_DOMAIN_NAME,
+                fromEmail: process.env.MAILGUN_FROM_EMAIL,
+            }),
         ],
         controllers: [],
         providers: [],
