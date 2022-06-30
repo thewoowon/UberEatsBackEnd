@@ -9,21 +9,27 @@ import { format } from 'path';
 @Injectable()
 export class MailService {
     constructor(@Inject(CONFIG_OPTIONS) private readonly options:MailModuleOptions){
-        console.log(options);
+        this.sendEmail('test','testing');
     }
 
-    async sendEmail(subject:string,content:string){
+    async sendEmail(subject:string,template:string){
         const form = new FormData();
-        form.append("form",`Exited User <mailgun@${this.options.domain}>`);
+        form.append("from",`Exited User <mailgun@${this.options.domain}>`);
         form.append("to",`thewoowon@naver.com`);
         form.append("subject",subject);
-        const response = await form.append("text",content);
-        got(`https://api.mailgun.net/v3/${this.options.domain}/messages`,{
-            method:"POST",
-            headers:{
-                "Authorization":`Basic ${Buffer.from(`api:${this.options.apiKey}`).toString('base64')}`,
+        form.append("template",template);
+        form.append("v:code","thewoowon");
+        form.append("v:username","Won");
+        const response = await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`,{
+                method:"POST",
+                headers:{
+                    Authorization:`Basic ${Buffer.from(
+                        `api:${this.options.apiKey}`,
+                    ).toString('base64')}`,
+                },
+                body:form,
             },
-            body:form,
-        });
+        );
+        console.log(response.body);
     }
 }
