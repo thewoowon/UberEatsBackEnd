@@ -10,6 +10,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "src/jwt/jwt.service";
 import { EditProfileInput } from "./dtos/edit-profile.dto";
 import { Verification } from "./entities/verification.entity";
+import { MailService } from "src/mail/mail.service";
 
 @Injectable()
 export class UsersService{
@@ -17,6 +18,7 @@ export class UsersService{
         @InjectRepository(User) private readonly users:Repository<User>,
         @InjectRepository(Verification) private readonly verifications:Repository<Verification>,
         private readonly jwtService:JwtService,
+        private readonly mailService:MailService,
     ){}
 
     usersAll():Promise<User[]>{
@@ -44,10 +46,12 @@ export class UsersService{
                 role:role
             }));
             // 여기에 이메일 인증 기능이 들어간다.
-            await this.verifications.save(this.verifications.create({
+            const verification = await this.verifications.save(
+                this.verifications.create({
                 user:user
-            }))
-
+                })
+            );
+            this.mailService.sendVerificationEmail(user.email,verification.code)
             return {
                 ok:true,
             };
@@ -130,7 +134,9 @@ export class UsersService{
         {
             user.email = email;
             user.verified= false;
-            await this.verifications.save(this.verifications.create({user:user}));
+            const verification = await this.verifications.save(this.verifications.create({user:user}));
+
+            this.mailService.sendVerificationEmail(user.email,verification.code)
         }
         if(password)
         {
