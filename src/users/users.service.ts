@@ -11,6 +11,7 @@ import { JwtService } from "src/jwt/jwt.service";
 import { EditProfileInput } from "./dtos/edit-profile.dto";
 import { Verification } from "./entities/verification.entity";
 import { MailService } from "src/mail/mail.service";
+import { UserProfileOutput } from "./dtos/user-profile.dto";
 
 @Injectable()
 export class UsersService{
@@ -104,18 +105,31 @@ export class UsersService{
         }
     }
 
-    async findById(id:number):Promise<User>{
-        return this.users.findOne({
-            select:{
-                email:true,
-                password:true,
-                id:true,
-                role:true,
-            },
-            where:{
-                id:id
+    async findById(id:number):Promise<UserProfileOutput>{
+        try{
+            const user = await this.users.findOneOrFail({
+                select:{
+                    email:true,
+                    password:true,
+                    id:true,
+                    role:true,
+                },
+                where:{
+                    id:id
+                }
+            });
+            return {
+                ok:true,
+                user:user,
             }
-        })
+        }
+        catch(e)
+        {   
+            return{
+                ok:false,
+                error:"User Not Found",
+            }
+        }
     }
 
     async editProfile(userId:number,{email,password}:EditProfileInput):Promise<User>{

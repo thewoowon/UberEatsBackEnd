@@ -11,10 +11,11 @@ const mockRepository = () => ({ //페이크 레포지토리 함수 객체를 만
     findOne:jest.fn(),
     save:jest.fn(),
     create:jest.fn(),
+    findOneOrFail:jest.fn(),
 });
 
 const mockJwtService = { // 제이슨 웹 토큰 페이크 함수 객체를 만든다.
-    sign:jest.fn(),
+    sign:jest.fn(()=>"signed-token-baby"),
     verify:jest.fn(),
 }
 
@@ -22,6 +23,8 @@ const mockJwtService = { // 제이슨 웹 토큰 페이크 함수 객체를 만�
 const mockMailService = { // 메일 서비스 함수 객체를 만든다.
     sendVerificationEmail:jest.fn(),
 }
+
+
 
 // Repository<T> <- 여기서 T는 엔티티로 설정이 되어 있는 객체로 가서 ORM의 테이블을 가져 오겠다는 의미임'
 // Record<array,type> 형식으로 array 안에 있는 각각의 레코드의 타입을 jest.Mock으로 페이크해서 본다는 의미
@@ -33,11 +36,16 @@ describe("UsersService",()=>{
 
     let service:UsersService;
     let userRepository:MockRepository<User>;
+    let verificationRepository:MockRepository<Verification>;
+    let mailService:MailService;
+    let jwtService:JwtService;
 
-    beforeAll(async () =>{
+    beforeEach(async () =>{
         const module = await Test.createTestingModule({
             providers:[
-                UsersService,{
+
+            UsersService,
+            {
                 provide:getRepositoryToken(User),
                 useValue:mockRepository(),
             },
@@ -55,15 +63,18 @@ describe("UsersService",()=>{
             },
         ],
         }).compile();
+        mailService = module.get<MailService>(MailService);
+        jwtService = module.get<JwtService>(JwtService);
         service = module.get<UsersService>(UsersService);
         userRepository = module.get(getRepositoryToken(User));
+        verificationRepository = module.get(getRepositoryToken(Verification));
     });
     it('should be defined',()=>{
         expect(service).toBeDefined();
     });
 
     describe('createAccount',()=>{
-        const craeteAccountArgs={
+        const createAccountArgs={
             email:'',
             password:'',
             role:0
@@ -73,7 +84,7 @@ describe("UsersService",()=>{
                 id:1,
                 email:'thewwwwww@naver.com',
             });
-            const result = await service.createAccount(craeteAccountArgs);
+            const result = await service.createAccount(createAccountArgs);
             expect(result).toMatchObject({
                 ok:false,
                 error:"There is already a Accout that have same email"
@@ -81,16 +92,101 @@ describe("UsersService",()=>{
         });
         it("should create a new user",async ()=>{
             userRepository.findOne.mockResolvedValue(undefined); //findOne을 건너뛰게 해주는 곳
-            userRepository.create.mockReturnValue(craeteAccountArgs);
-            await service.createAccount(craeteAccountArgs);
-            expect(userRepository.create).toHaveBeenCalledTimes(1);
-            expect(userRepository.create).toHaveBeenCalledWith(craeteAccountArgs);
-            expect(userRepository.save).toHaveBeenCalledTimes(1)
-            expect(userRepository.save).toHaveBeenCalledWith(craeteAccountArgs)
+            userRepository.create.mockReturnValue(createAccountArgs); // 계정 생성
+            userRepository.save.mockResolvedValue(createAccountArgs); // 데이터 베이스 동기화
+            verificationRepository.create.mockReturnValue({
+                user:createAccountArgs,
+            });
+            verificationRepository.save.mockResolvedValue({
+                code:'code'
+            });
+            const result = await service.createAccount(createAccountArgs); // 계정 생성
+            expect(userRepository.create).toHaveBeenCalledTimes(1); // 한 번만 실행되어야 한다.
+            expect(userRepository.create).toHaveBeenCalledWith(createAccountArgs); // 인자를 입력받아야 한다.
+            expect(userRepository.save).toHaveBeenCalledTimes(1) // 한 번만 실행되어야 한다.
+            expect(userRepository.save).toHaveBeenCalledWith(createAccountArgs); // 인자를 입력받아야 한다.
+            expect(verificationRepository.create).toHaveBeenCalledTimes(1); // 한 번만 호출되어야한다.
+            expect(verificationRepository.create).toHaveBeenCalledWith({
+                user:createAccountArgs
+            }); // 호출 시 인자를 입력받아야한다.
+            expect(verificationRepository.save).toHaveBeenCalledTimes(1) // 한 번만 실행되어야 한다.
+            expect(verificationRepository.save).toHaveBeenCalledWith({
+                user:createAccountArgs
+            }); // 인자를 입력받아야 한다.
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+                expect.any(String),
+                expect.any(String)
+            );
+                expect(result).toEqual({ok:true});
+        });
+        it("should fail on exception", async ()=>{
+            userRepository.findOne.mockRejectedValue(new Error());
+            const result = await service.createAccount(createAccountArgs);
+            expect(result).toEqual({
+                ok:false,
+                error:"Couldn't Make a Account from your request"
+            });
+        })
+    });
+
+    describe('login',()=>{
+        const loginArg = {
+            email:'WwId',
+            password:"WwPw"
+        }
+
+        it('should fail it user does not exist', async ()=>{
+            userRepository.findOne.mockResolvedValue(null);
+            const result = await service.login(loginArg);
+
+            expect(userRepository.findOne).toHaveBeenCalledTimes(1);
+            expect(userRepository.findOne).toHaveBeenCalledWith(
+                expect.any(Object),
+                // expect.any({"select":Object}),
+                // expect.any({"where":Object}),
+            );
+            expect(result).toEqual({
+                ok: false,
+                error:"User not found"
+            });
+        });
+        it('should fail if the password is wrong',async ()=>{
+            const mockedUser = {
+                id:1,
+                checkPassword:jest.fn(()=> Promise.resolve(false)),
+            };
+            userRepository.findOne.mockResolvedValue(mockedUser);
+            const result = await service.login(loginArg);
+            expect(result).toEqual({ok:false,error:"Wrong Password"});
+            
+        });
+        it('should return token if pasword correct',async ()=>{
+            const mockedUser = {
+                id:1,
+                checkPassword:jest.fn(()=> Promise.resolve(true)),
+            };
+            userRepository.findOne.mockResolvedValue(mockedUser);
+            const result = await service.login(loginArg);
+            expect(jwtService.sign).toHaveBeenCalledTimes(1);
+            expect(jwtService.sign).toHaveBeenCalledWith(
+                expect.any(Object)
+            );
+            expect(result).toEqual({ ok: true, token: 'signed-token-baby' });
+        });
+    });
+
+    describe('findById',()=>{
+        const findByIdArgs = {
+            id: 1,
+        };
+        it('should find an existing user',async ()=>{
+            userRepository.findOneOrFail.mockResolvedValue({id:1})
+            const result = await service.findById(1);
+            expect(result).toEqual({ok:true,user:findByIdArgs});
         })
     })
-    it.todo('login')
-    it.todo('findById')
     it.todo('editProfile')
     it.todo('verifyEmail')
 });
+
