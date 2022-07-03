@@ -12,6 +12,7 @@ import { EditProfileInput, EditProfileOutput } from "./dtos/edit-profile.dto";
 import { Verification } from "./entities/verification.entity";
 import { MailService } from "src/mail/mail.service";
 import { UserProfileOutput } from "./dtos/user-profile.dto";
+import { VerifyEmailOutput } from "./dtos/verify-email.dto";
 
 @Injectable()
 export class UsersService{
@@ -136,16 +137,16 @@ export class UsersService{
         try{
             const user = await this.users.findOne({
                 select:{
-                    id:true,
                     email:true,
                     password:true,
-                    role:true,
                     verified:true,
                 },
                 where:{
                     id:userId
                 }
-            });   
+            }); 
+            if(password ==='new')
+                console.log(email);
             if(email){
                 user.email = email;
                 user.verified= false;
@@ -169,7 +170,7 @@ export class UsersService{
         }
     }
 
-    async verifyEmail(code:string):Promise<boolean>{
+    async verifyEmail(code:string):Promise<VerifyEmailOutput>{
         try{
             const verification = await this.verifications.findOne({
                 relations:['user'],
@@ -177,20 +178,18 @@ export class UsersService{
                     code:code
                 },
             })
-    
+            console.log(verification);
             if(verification)
             {
                 verification.user.verified = true;
                 await this.users.save(verification.user);
                 await this.verifications.delete(verification.id);
-                return true;
+                return {ok:true};
             }
-            throw new Error();
+            return {ok:false,error:'Verification not found'};
         }
-        catch(e)
-        {
-            console.log(e);
-            return false;
+        catch(e){
+            return {ok:false,error:'Could not verify email'};
         }
     }
 }

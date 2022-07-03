@@ -12,17 +12,18 @@ const mockRepository = () => ({ //페이크 레포지토리 함수 객체를 만
     save:jest.fn(),
     create:jest.fn(),
     findOneOrFail:jest.fn(),
+    delete:jest.fn()
 });
 
-const mockJwtService = { // 제이슨 웹 토큰 페이크 함수 객체를 만든다.
+const mockJwtService = () => ({ // 제이슨 웹 토큰 페이크 함수 객체를 만든다.
     sign:jest.fn(()=>"signed-token-baby"),
     verify:jest.fn(),
-}
+})
 
 
-const mockMailService = { // 메일 서비스 함수 객체를 만든다.
+const mockMailService = () => ({ // 메일 서비스 함수 객체를 만든다.
     sendVerificationEmail:jest.fn(),
-}
+})
 
 
 
@@ -44,24 +45,24 @@ describe("UsersService",()=>{
         const module = await Test.createTestingModule({
             providers:[
 
-            UsersService,
-            {
-                provide:getRepositoryToken(User),
-                useValue:mockRepository(),
-            },
-            {
-                provide:getRepositoryToken(Verification),
-                useValue:mockRepository(),
-            },
-            {
-                provide:JwtService,
-                useValue:mockJwtService,
-            },
-            {
-                provide:MailService,
-                useValue:mockMailService,
-            },
-        ],
+                UsersService,
+                {
+                    provide:getRepositoryToken(User),
+                    useValue:mockRepository(),
+                },
+                {
+                    provide:getRepositoryToken(Verification),
+                    useValue:mockRepository(),
+                },
+                {
+                    provide:JwtService,
+                    useValue:mockJwtService(),
+                },
+                {
+                    provide:MailService,
+                    useValue:mockMailService(),
+                },
+            ],
         }).compile();
         mailService = module.get<MailService>(MailService);
         jwtService = module.get<JwtService>(JwtService);
@@ -75,8 +76,8 @@ describe("UsersService",()=>{
 
     describe('createAccount',()=>{
         const createAccountArgs={
-            email:'',
-            password:'',
+            email:'thewoowow@naver.com',
+            password:'12345',
             role:0
         }
         it("should fail if user exists",async ()=>{
@@ -94,31 +95,20 @@ describe("UsersService",()=>{
             userRepository.findOne.mockResolvedValue(undefined); //findOne을 건너뛰게 해주는 곳
             userRepository.create.mockReturnValue(createAccountArgs); // 계정 생성
             userRepository.save.mockResolvedValue(createAccountArgs); // 데이터 베이스 동기화
-            verificationRepository.create.mockReturnValue({
-                user:createAccountArgs,
-            });
-            verificationRepository.save.mockResolvedValue({
-                code:'code'
-            });
+            verificationRepository.create.mockReturnValue({code:'code',user:createAccountArgs});
+            verificationRepository.save.mockResolvedValue({code:'code',user:createAccountArgs});
             const result = await service.createAccount(createAccountArgs); // 계정 생성
             expect(userRepository.create).toHaveBeenCalledTimes(1); // 한 번만 실행되어야 한다.
             expect(userRepository.create).toHaveBeenCalledWith(createAccountArgs); // 인자를 입력받아야 한다.
             expect(userRepository.save).toHaveBeenCalledTimes(1) // 한 번만 실행되어야 한다.
             expect(userRepository.save).toHaveBeenCalledWith(createAccountArgs); // 인자를 입력받아야 한다.
             expect(verificationRepository.create).toHaveBeenCalledTimes(1); // 한 번만 호출되어야한다.
-            expect(verificationRepository.create).toHaveBeenCalledWith({
-                user:createAccountArgs
-            }); // 호출 시 인자를 입력받아야한다.
+            expect(verificationRepository.create).toHaveBeenCalledWith({user:createAccountArgs}); // 호출 시 인자를 입력받아야한다.
             expect(verificationRepository.save).toHaveBeenCalledTimes(1) // 한 번만 실행되어야 한다.
-            expect(verificationRepository.save).toHaveBeenCalledWith({
-                user:createAccountArgs
-            }); // 인자를 입력받아야 한다.
+            expect(verificationRepository.save).toHaveBeenCalledWith({code:'code',user:createAccountArgs}); // 인자를 입력받아야 한다.
             expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
-            expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
-                expect.any(String),
-                expect.any(String)
-            );
-                expect(result).toEqual({ok:true});
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String),expect.any(String));
+            expect(result).toEqual({ok:true});
         });
         it("should fail on exception", async ()=>{
             userRepository.findOne.mockRejectedValue(new Error());
@@ -213,7 +203,7 @@ describe("UsersService",()=>{
             userRepository.findOne.mockResolvedValue(oldUser);
             verificationRepository.create.mockReturnValue(newVerification);
             verificationRepository.save.mockResolvedValue(newVerification);
-            await service.editProfile(editProfileArgs.userId,editProfileArgs.input);
+            const result = await service.editProfile(editProfileArgs.userId,editProfileArgs.input);
             expect(userRepository.findOne).toHaveBeenCalledTimes(1);
             expect(userRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
             expect(verificationRepository.create).toHaveBeenCalledWith({user:newUser});
@@ -223,7 +213,50 @@ describe("UsersService",()=>{
                 newVerification.code
             )
         });
+        it('should change password', async () =>{
+            const editProfileArgs = {userId:1,input:{password:'new'},};
+            userRepository.findOne.mockResolvedValue({password:'old'});
+            const result = await service.editProfile(editProfileArgs.userId,editProfileArgs.input);
+            expect(userRepository.save).toHaveBeenCalledTimes(1);
+            expect(userRepository.save).toHaveBeenCalledWith(editProfileArgs.input);
+            expect(result).toEqual({ok:true});
+        })
+        it('should fail on exception',async () =>{
+            userRepository.findOne.mockRejectedValue(new Error());
+            const result = await service.editProfile(1,{email:'12'});
+            expect(result).toEqual({ok:false,error:'Could not update profile'});
+
+        })
     });
-    it.todo('verifyEmail')
+    describe('verifyEmail',()=>{
+        it('should verify email',async ()=>{
+            const mockedVerification = {
+                user:{
+                    verified:false,
+                },
+                id:1,
+            }
+            verificationRepository.findOne.mockResolvedValue(mockedVerification);
+            const result = await service.verifyEmail('');
+            expect(verificationRepository.findOne).toHaveBeenCalledTimes(1);
+            expect(verificationRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
+            expect(userRepository.save).toHaveBeenCalledTimes(1);
+            expect(userRepository.save).toHaveBeenCalledWith({verified:true});
+            expect(verificationRepository.delete).toHaveBeenCalledTimes(1);
+            expect(verificationRepository.delete).toHaveBeenCalledWith(mockedVerification.id);
+            expect(result).toEqual({ok:true});
+        });
+        it('should fail on verification not found',async ()=>{
+            verificationRepository.findOne.mockResolvedValue(undefined);
+            const result = await service.verifyEmail("");
+            expect(result).toEqual({ok:false,error:'Verification not found'});
+
+        });
+        it('should fail on exception',async ()=>{
+            verificationRepository.findOne.mockResolvedValue(new Error());
+            const result = await service.verifyEmail("");
+            expect(result).toEqual({ok:false,error:'Could not verify email'});
+        });
+    })
 });
 
