@@ -145,8 +145,6 @@ export class UsersService{
                     id:userId
                 }
             }); 
-            if(password ==='new')
-                console.log(email);
             if(email){
                 user.email = email;
                 user.verified= false;
@@ -178,7 +176,6 @@ export class UsersService{
                     code:code
                 },
             })
-            console.log(verification);
             if(verification)
             {
                 verification.user.verified = true;
