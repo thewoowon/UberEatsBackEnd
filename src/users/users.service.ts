@@ -8,7 +8,7 @@ import { User } from "./entities/user.entity";
 import * as Jwt from "jsonwebtoken";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "src/jwt/jwt.service";
-import { EditProfileInput } from "./dtos/edit-profile.dto";
+import { EditProfileInput, EditProfileOutput } from "./dtos/edit-profile.dto";
 import { Verification } from "./entities/verification.entity";
 import { MailService } from "src/mail/mail.service";
 import { UserProfileOutput } from "./dtos/user-profile.dto";
@@ -132,31 +132,41 @@ export class UsersService{
         }
     }
 
-    async editProfile(userId:number,{email,password}:EditProfileInput):Promise<User>{
-        const user = await this.users.findOne({
-            select:{
-                id:true,
-                email:true,
-                password:true,
-                role:true,
-            },
-            where:{
-                id:userId
+    async editProfile(userId:number,{email,password}:EditProfileInput):Promise<EditProfileOutput>{
+        try{
+            const user = await this.users.findOne({
+                select:{
+                    id:true,
+                    email:true,
+                    password:true,
+                    role:true,
+                    verified:true,
+                },
+                where:{
+                    id:userId
+                }
+            });   
+            if(email){
+                user.email = email;
+                user.verified= false;
+                const verification = await this.verifications.save(
+                    this.verifications.create({user:user})
+                );
+                this.mailService.sendVerificationEmail(user.email,verification.code)
             }
-        });
-        if(email)
-        {
-            user.email = email;
-            user.verified= false;
-            const verification = await this.verifications.save(this.verifications.create({user:user}));
-
-            this.mailService.sendVerificationEmail(user.email,verification.code)
+            if(password){
+                user.password = password;
+            }
+            await this.users.save(user);
+            return{
+                ok:true
+            }
         }
-        if(password)
-        {
-            user.password = password;
+        catch(e){
+            return{
+                ok:false,error:'Could not update profile'
+            };
         }
-        return await this.users.save(user);
     }
 
     async verifyEmail(code:string):Promise<boolean>{
