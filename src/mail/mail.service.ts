@@ -15,7 +15,7 @@ export class MailService {
 
     }
 
-    async sendEmail(subject:string,template:string,emailVars:EmailVar[]){
+    async sendEmail(subject:string,template:string,emailVars:EmailVar[]):Promise<boolean>{
         const form = new FormData();
         form.append("from",`Won From Uber Eats <mailgun@${this.options.domain}>`);
         form.append("to",`thewoowon@naver.com`);
@@ -24,8 +24,7 @@ export class MailService {
         emailVars.forEach(eVar => form.append(`v:${eVar.key}`,`${eVar.value}`));
 
         try{
-            await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`,{
-                    method:"POST",
+            await got.post(`https://api.mailgun.net/v3/${this.options.domain}/messages`,{
                     headers:{
                         Authorization:`Basic ${Buffer.from(
                             `api:${this.options.apiKey}`,
@@ -34,10 +33,10 @@ export class MailService {
                     body:form,
                 },
             );
-            //console.log(this.options);
+            return true;
         }
         catch(e){
-            console.log(e);
+            return false;
         }
     }
 
