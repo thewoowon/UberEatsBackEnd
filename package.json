@@ -45,6 +45,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.6",
+    "typeorm-extension": "^2.1.4",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -71,8 +72,8 @@
     "typescript": "^4.3.5"
   },
   "jest": {
-    "moduleNameMapper":{
-      "^src/(.*)":"<rootDir>/$1"
+    "moduleNameMapper": {
+      "^src/(.*)": "<rootDir>/$1"
     },
     "moduleFileExtensions": [
       "js",
@@ -89,7 +90,7 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "coveragePathIgnorePatterns":[
+    "coveragePathIgnorePatterns": [
       "node_modules",
       ".entity.ts",
       ".constants.ts"
