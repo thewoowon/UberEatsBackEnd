@@ -2,15 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { DataSource,DataSourceOptions} from 'typeorm'
+import {  DataSource,DataSourceOptions, Repository} from 'typeorm'
 import { dropDatabase } from 'typeorm-extension';
 import { Verification } from 'src/users/entities/verification.entity';
 import { User } from 'src/users/entities/user.entity';
+import { getDataSourceToken } from '@nestjs/typeorm';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let userRepository:Repository<User>;
+  let verificationRepository:Repository<Verification>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,8 +24,24 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
   afterAll(async () => {
-    await dropDatabase();
-    app.close();
+
+    const options:DataSourceOptions = {
+      type:'postgres',
+      database:'uber-eats-test',
+      host: 'localhost',
+      port: 5432,
+      username: 'woowon',
+      password: 'Ww940706!!',
+      synchronize: true,
+      logging: false,
+      entities:[User,Verification]
+    }
+    const dataSource = new DataSource(options);
+    await dataSource.initialize();
+    await dataSource.driver.connect();
+    await dataSource.dropDatabase();
+    await dataSource.destroy();
+    await app.close();
   });
 
   describe('createAccount',()=>{
@@ -41,7 +60,10 @@ describe('AppController (e2e)', () => {
             error
           }
         }`
-      }).expect(200);
+      }).expect(200)
+      .expect(res =>{
+        console.log(res.body);
+      })
     });
     it.todo('should fail if account already exists');
   });

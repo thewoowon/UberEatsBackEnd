@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
-import { User } from "./users/entities/user.entity";
-import { Verification } from "./users/entities/verification.entity";
+import { User } from "../users/entities/user.entity";
+import { Verification } from "../users/entities/verification.entity";
 
 export const UberEatsTest = new DataSource({
     type: "postgres",
