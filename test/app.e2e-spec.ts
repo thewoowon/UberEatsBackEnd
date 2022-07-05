@@ -6,13 +6,21 @@ import {  DataSource,DataSourceOptions, Repository} from 'typeorm'
 import { dropDatabase } from 'typeorm-extension';
 import { Verification } from 'src/users/entities/verification.entity';
 import { User } from 'src/users/entities/user.entity';
-import { getDataSourceToken } from '@nestjs/typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
+
+
+jest.mock('got',()=>{
+  return {
+    post:jest.fn(),
+  }
+});
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let userRepository:Repository<User>;
+  let jwtToken: string = "";
   let verificationRepository:Repository<Verification>;
 
   beforeAll(async () => {
@@ -21,8 +29,10 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = module.createNestApplication();
+    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     await app.init();
   });
+
   afterAll(async () => {
 
     const options:DataSourceOptions = {
@@ -65,9 +75,68 @@ describe('AppController (e2e)', () => {
         expect(res.body.data.createAccount.error).toBe(null);
       });
     });
-    it.todo('should fail if account already exists');
+    it('should fail if account already exists',()=>{
+      return request(app.getHttpServer()).post(GRAPHQL_ENDPOINT).send({
+        query:`mutation{
+          createAccount(input:{
+            email:"${EMAIL}"
+            password:"Ww940706!!"
+            role:Owner
+          })
+          {
+            ok
+            error
+          }
+        }`
+      }).expect(200)
+      .expect(res =>{
+        expect(res.body.data.createAccount.ok).toBe(false);
+        expect(res.body.data.createAccount.error).toEqual("There is already a Accout that have same email");
+      })
+    });
   });
-  it.todo('userProfile');
+  describe('userProfile',()=>{
+    let userId:number;
+    beforeAll(async ()=>{
+      const [user] =  await userRepository.find();
+      userId = user.id;
+    });
+    it('should see a user\'s profile',()=>{
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .set(`X-JWT`,jwtToken)
+      .send({
+        query:`
+        {
+          userProfile(userId:${userId}){
+            ok
+            error
+            user{
+              id
+            }
+          }
+        }
+        `
+      }).expect(200)
+      .expect(res => {
+        const {
+          body:{
+            data:{
+              userProfile:{
+                ok,
+                error,
+                user:{id}
+              }
+            }
+          }
+        } = res;
+        expect(ok).toBe(true);
+        expect(error).toBe(null);
+        expect(id).toBe(userId);
+      })
+    });
+    it.todo('should not find a profile');
+  });
   it.todo('login');
   it.todo('me');
   it.todo('verifyEmail');
