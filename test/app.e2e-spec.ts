@@ -38,7 +38,6 @@ describe('AppController (e2e)', () => {
     }
     const dataSource = new DataSource(options);
     await dataSource.initialize();
-    await dataSource.driver.connect();
     await dataSource.dropDatabase();
     await dataSource.destroy();
     await app.close();
@@ -62,8 +61,9 @@ describe('AppController (e2e)', () => {
         }`
       }).expect(200)
       .expect(res =>{
-        console.log(res.body);
-      })
+        expect(res.body.data.createAccount.ok).toBe(true);
+        expect(res.body.data.createAccount.error).toBe(null);
+      });
     });
     it.todo('should fail if account already exists');
   });
