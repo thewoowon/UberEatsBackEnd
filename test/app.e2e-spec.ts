@@ -20,7 +20,7 @@ const GRAPHQL_ENDPOINT = '/graphql';
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let userRepository:Repository<User>;
-  let jwtToken: string = "";
+  let jwtToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ0aGV3b293b25AbmF2ZXIuY29tIiwiaWF0IjoxNjU2Njc0MDMwfQ.S0sAhcDGNI0MVxbqzoQsLQmd4o3DbnJCfBNRLbJImoI";
   let verificationRepository:Repository<Verification>;
 
   beforeAll(async () => {
@@ -119,6 +119,7 @@ describe('AppController (e2e)', () => {
         `
       }).expect(200)
       .expect(res => {
+        console.log(res.body.data);
         const {
           body:{
             data:{
