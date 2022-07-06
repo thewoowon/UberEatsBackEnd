@@ -17,10 +17,16 @@ jest.mock('got',()=>{
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
+const testUser = {
+  email: 'thewoowon@naver.com',
+  password: 'Ww940706!!',
+};
+
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let userRepository:Repository<User>;
-  let jwtToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ0aGV3b293b25AbmF2ZXIuY29tIiwiaWF0IjoxNjU2Njc0MDMwfQ.S0sAhcDGNI0MVxbqzoQsLQmd4o3DbnJCfBNRLbJImoI";
+  let jwtToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJ0aGV3b293b25AbmF2ZXIuY29tIiwiaWF0IjoxNjU3MTE2MzM5fQ.VEXSG2IduCNY_h7pCx2x_lJrNGv-7HJZf92Q2zl5oY8";
   let verificationRepository:Repository<Verification>;
 
   beforeAll(async () => {
@@ -119,7 +125,7 @@ describe('AppController (e2e)', () => {
         `
       }).expect(200)
       .expect(res => {
-        console.log(res.body.data);
+        console.log(res);
         const {
           body:{
             data:{
@@ -154,7 +160,6 @@ describe('AppController (e2e)', () => {
         `
       }).expect(200)
       .expect(res => {
-        console.log(res.body.data);
         const {
           body:{
             data:{
@@ -173,7 +178,32 @@ describe('AppController (e2e)', () => {
     });
   });
   it.todo('login');
-  it.todo('me');
+  describe('me',()=>{
+    it('should find my profile',()=>{
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .set(`X-JWT`,jwtToken)
+      .send({
+        query:`
+        {
+          me{
+            email
+          }
+        }
+        `
+      }).expect(200)
+      .expect(res =>{
+        const {
+          body:{
+            data:{
+              me:{email},
+            },
+          },
+        } = res;
+        expect(email).toBe(testUser.email);
+      });
+    })
+  });
   it.todo('verifyEmail');
   it.todo('editProfile');
 
