@@ -135,6 +135,21 @@ export class UsersService{
 
     async editProfile(userId:number,{email,password}:EditProfileInput):Promise<EditProfileOutput>{
         try{
+            const dupleEmail = await this.users.findOne({
+                select:{
+                    email:true,
+                },
+                where:{
+                    email:email,
+                }
+            })
+            if(dupleEmail)
+            {
+                return{
+                    ok:false,error:'Same Email Already Exists'
+                };
+            }
+
             const user = await this.users.findOne({
                 select:{
                     email:true,

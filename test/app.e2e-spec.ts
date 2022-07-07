@@ -26,7 +26,7 @@ const testUser = {
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let userRepository:Repository<User>;
-  let jwtToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJ0aGV3b293b25AbmF2ZXIuY29tIiwiaWF0IjoxNjU3MTE2MzM5fQ.VEXSG2IduCNY_h7pCx2x_lJrNGv-7HJZf92Q2zl5oY8";
+  let jwtToken: string;
   let verificationRepository:Repository<Verification>;
 
   beforeAll(async () => {
@@ -61,13 +61,12 @@ describe('AppController (e2e)', () => {
 
   describe('createAccount',()=>{
 
-    const EMAIL = "thewoowon@naver.com";
     it('should create account',()=>{
       return request(app.getHttpServer()).post(GRAPHQL_ENDPOINT).send({
         query:`mutation{
           createAccount(input:{
-            email:"${EMAIL}"
-            password:"Ww940706!!"
+            email:"${testUser.email}"
+            password:"${testUser.password}"
             role:Owner
           })
           {
@@ -85,8 +84,8 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer()).post(GRAPHQL_ENDPOINT).send({
         query:`mutation{
           createAccount(input:{
-            email:"${EMAIL}"
-            password:"Ww940706!!"
+            email:"${testUser.email}"
+            password:"${testUser.password}"
             role:Owner
           })
           {
@@ -99,6 +98,66 @@ describe('AppController (e2e)', () => {
         expect(res.body.data.createAccount.ok).toBe(false);
         expect(res.body.data.createAccount.error).toEqual("There is already a Accout that have same email");
       })
+    });
+  });
+  describe('login',()=>{
+    it('should login with correct credential',()=>{
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query:`
+        mutation{
+          login(input:{
+            email:"${testUser.email}"
+            password:"${testUser.password}"
+          }){
+            ok
+            token
+            error
+          }
+        }
+        `
+      }).expect(200)
+      .expect(res =>{
+        const {
+          body:{
+            data:{login},
+          }
+        } = res;
+        expect(login.ok).toBe(true);
+        expect(login.error).toBe(null);
+        expect(login.token).toEqual(expect.any(String));
+        jwtToken = login.token;
+      });
+    });
+    it('should not be able to login with wrong credentials',()=>{
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query:`
+        mutation{
+          login(input:{
+            email:"${testUser.email}"
+            password:"1234"
+          }){
+            ok
+            token
+            error
+          }
+        }
+        `
+      })
+      .expect(200)
+      .expect(res => {
+        const {
+          body :{
+            data:{login},
+          },
+        } = res;
+        expect(login.ok).toBe(false);
+        expect(login.error).toBe('Wrong Password');
+        expect(login.token).toBe(null);
+      });
     });
   });
   describe('userProfile',()=>{
@@ -177,7 +236,6 @@ describe('AppController (e2e)', () => {
       });
     });
   });
-  it.todo('login');
   describe('me',()=>{
     it('should find my profile',()=>{
       return request(app.getHttpServer())
@@ -202,9 +260,31 @@ describe('AppController (e2e)', () => {
         } = res;
         expect(email).toBe(testUser.email);
       });
+    });
+    it('should not allow logged out user',()=>{
+      return request(app.getHttpServer())
+      .post(GRAPHQL_ENDPOINT)
+      .send({
+        query:`
+        {
+          me{
+            email
+          }
+        }
+        `
+      }).expect(200)
+      .expect(res =>{
+        console.log(res.body);
+        const {
+          body:{errors}
+        } = res;
+        errors[0].messages.toEqual('Forbidden resource');
+      })
     })
   });
-  it.todo('verifyEmail');
-  it.todo('editProfile');
 
+  describe('editProfile',()=>{
+    it('editProfile');
+  })
+  it.todo('verifyEmail');
 });
