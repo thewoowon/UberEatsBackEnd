@@ -5,7 +5,7 @@ import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "t
 import { Restaurant } from "./restaurant.entity";
 
 
-@InputType({isAbstract:true})
+@InputType('CategoryInputType',{isAbstract:true})
 @ObjectType()
 @Entity()
 export class Category extends CoreEntity{
