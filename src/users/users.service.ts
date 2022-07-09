@@ -135,26 +135,13 @@ export class UsersService{
 
     async editProfile(userId:number,{email,password}:EditProfileInput):Promise<EditProfileOutput>{
         try{
-            const dupleEmail = await this.users.findOne({
-                select:{
-                    email:true,
-                },
-                where:{
-                    email:email,
-                }
-            })
-            if(dupleEmail)
-            {
-                return{
-                    ok:false,error:'Same Email Already Exists'
-                };
-            }
-
             const user = await this.users.findOne({
                 select:{
                     email:true,
                     password:true,
                     verified:true,
+                    id:true,
+                    role:true
                 },
                 where:{
                     id:userId
@@ -163,11 +150,13 @@ export class UsersService{
             if(email){
                 user.email = email;
                 user.verified= false;
+                await this.verifications.delete({user:{id:user.id}});
                 const verification = await this.verifications.save(
                     this.verifications.create({user:user})
                 );
                 this.mailService.sendVerificationEmail(user.email,verification.code)
             }
+            console.log('password intro')
             if(password){
                 user.password = password;
             }
@@ -193,6 +182,7 @@ export class UsersService{
             })
             if(verification)
             {
+                console.log('내부');
                 verification.user.verified = true;
                 await this.users.save(verification.user);
                 await this.verifications.delete(verification.id);
