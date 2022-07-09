@@ -27,15 +27,7 @@ export class Restaurant extends CoreEntity{
     @IsString()
     address:string;
 
-    @Field(type => String)
-    @Column()
-    ownerName:string;
-
-    @Field(type => String)
-    @Column()
-    @IsString()
-    categoryName:string;
-
-    @ManyToOne(()=> Category,category => category.restaurants)
+    @Field(type => Category,{nullable:true})
+    @ManyToOne(()=> Category,category => category.restaurants,{nullable:true,onDelete:"SET NULL"})
     category: Category;
 }
