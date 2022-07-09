@@ -12,15 +12,20 @@ export class Category extends CoreEntity{
     // 데이터 베이스와 상호 작용 할 수 있는 장치인 BaseEntity    
 
     @Field(type => String)
-    @Column()
+    @Column({unique:true})
     @IsString()
     @Length(5)
     name:string;
 
-    @Field(type=>String)
-    @Column()
+    @Field(type=>String,{nullable:true})
+    @Column({nullable:true})
     @IsString()
     coverImg:string;
+
+    @Field(type =>String)
+    @Column({unique:true})
+    @IsString()
+    slug:string;
 
     @Field(type =>[Restaurant])
     @OneToMany(type => Restaurant,restaurant => restaurant.category)
