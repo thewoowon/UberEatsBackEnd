@@ -33,6 +33,6 @@ export class Restaurant extends CoreEntity{
     category: Category;
 
     @Field(type => User,{nullable:true})
-    @ManyToOne(()=> User,user => user.restaurants,{nullable:true,onDelete:"SET NULL"})
+    @ManyToOne(()=> User,user => user.restaurants,{nullable:true,onDelete:"CASCADE"})
     owner: User;
 }

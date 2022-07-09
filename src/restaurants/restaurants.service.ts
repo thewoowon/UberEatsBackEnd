@@ -24,7 +24,9 @@ export class RestaurantService{
             const categorySlug = categoryName.replace(/ /g,'-');
             let category =  await this.categories.findOne({where:{slug:categorySlug}});
             if(!category){
-                category = await this.categories.save(this.categories.create({slug:categorySlug,name:categoryName}));
+                category = await this.categories.save(
+                    this.categories.create({slug:categorySlug,name:categoryName})
+                );
             }
             newRestaurant.category = category;
             await this.restaurants.save(newRestaurant);

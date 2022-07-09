@@ -20,6 +20,7 @@ const users_module_1 = require("./users/users.module");
 const user_entity_1 = require("./users/entities/user.entity");
 const jwt_module_1 = require("./jwt/jwt.module");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
+const auth_module_1 = require("./auth/auth.module");
 const verification_entity_1 = require("./users/entities/verification.entity");
 const mail_module_1 = require("./mail/mail.module");
 const category_entity_1 = require("./restaurants/entities/category.entity");
@@ -77,7 +78,8 @@ AppModule = __decorate([
                 domain: process.env.MAILGUN_DOMAIN_NAME,
                 fromEmail: process.env.MAILGUN_FROM_EMAIL,
             }),
-            restaurants_module_1.RestaurantsModule
+            restaurants_module_1.RestaurantsModule,
+            auth_module_1.AuthModule
         ],
         controllers: [],
         providers: [],
