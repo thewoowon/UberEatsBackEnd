@@ -60,6 +60,17 @@ export class RestaurantService{
                     error:"Yout can't edit a restaurant that you don't own"
                 };
             }
+            let category:Category = null;
+            if(editRestaurantInput.categoryName){
+                category = await this.categories.getOrCreate(editRestaurantInput.categoryName);
+            }
+            await this.restaurants.save([{
+                id:editRestaurantInput.restaurantId,
+                ...editRestaurantInput,
+                ...(category && {category})
+
+            }])
+
             return{
                 ok:true
             }
