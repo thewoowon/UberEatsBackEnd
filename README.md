@@ -18,3 +18,20 @@
 </p>
 
 ## Nest.js
+
+
+# UberEats
+
+The Backend of Uber Eats Clone
+
+- Edit Restaurant
+- Delete Restaurant
+
+- See Categories
+- See Restaurants by Category (Pagination)
+- See Restaurants (Pagination)
+- See Restaurant
+
+- Creatre Dish
+- Edit Dish
+- Delete Dish

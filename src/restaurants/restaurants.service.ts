@@ -5,6 +5,7 @@ import { Restaurant } from "./entities/restaurant.entity";
 import { CreateRestaurantInput, CreateRestaurantOutput } from "./dtos/create-restaurant.dto";
 import { User } from "src/users/entities/user.entity";
 import { Category } from "./entities/category.entity";
+import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto";
 
 @Injectable()
 export class RestaurantService{
@@ -41,5 +42,21 @@ export class RestaurantService{
                 error:"Could not create restaurant"
             }
         }
+    }
+
+    async editRestaurant(
+        owner:User,
+        editRestaurantInput:EditRestaurantInput):Promise<EditRestaurantOutput>{
+        try{
+            return{
+                ok:true
+            }
+        }
+        catch(e){
+            return{
+                ok:true
+            }
+        }
+
     }
 }
