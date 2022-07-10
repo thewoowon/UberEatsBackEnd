@@ -26,10 +26,10 @@ export class RestaurantResolver{
     @Mutation(returns => EditProfileOutput)
     @Role(['Owner'])
     async editRestaurant(
-        @AuthUser() authUser:User,
+        @AuthUser() owner:User,
         @Args('input') editRestaurantInput:EditRestaurantInput
     ):Promise<EditRestaurantOutput>{
-        return {ok:true}
+        return await this.restaurantService.editRestaurant(owner,editRestaurantInput)
     }
 
 }

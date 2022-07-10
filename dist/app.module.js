@@ -24,8 +24,6 @@ const auth_module_1 = require("./auth/auth.module");
 const verification_entity_1 = require("./users/entities/verification.entity");
 const mail_module_1 = require("./mail/mail.module");
 const category_entity_1 = require("./restaurants/entities/category.entity");
-const typeorm_ex_module_1 = require("./database/typeorm-ex.module");
-const category_repository_1 = require("./restaurants/repositories/category.repository");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
@@ -81,7 +79,6 @@ AppModule = __decorate([
             }),
             restaurants_module_1.RestaurantsModule,
             auth_module_1.AuthModule,
-            typeorm_ex_module_1.TypeOrmExModule.forCustomRepository([category_repository_1.CategoryRepository]),
         ],
         controllers: [],
         providers: [],

@@ -66,7 +66,6 @@ import { CategoryRepository } from './restaurants/repositories/category.reposito
     }),
     RestaurantsModule,
     AuthModule,
-    TypeOrmExModule.forCustomRepository([CategoryRepository]),
   ],
   controllers: [],
   providers: [],

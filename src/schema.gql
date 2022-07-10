@@ -24,6 +24,16 @@ enum UserRole {
   Delivery
 }
 
+type Category {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  coverImg: String
+  slug: String!
+  restaurants: [Restaurant!]!
+}
+
 type Restaurant {
   id: Float!
   createdAt: DateTime!
@@ -33,16 +43,6 @@ type Restaurant {
   address: String!
   category: Category
   owner: User
-}
-
-type Category {
-  id: Float!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  name: String!
-  coverImg: String
-  slug: String!
-  restaurants: [Restaurant!]!
 }
 
 type CreateRestaurantOutput {
