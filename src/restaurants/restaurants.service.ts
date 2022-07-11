@@ -134,7 +134,9 @@ export class RestaurantService{
     countRestaurants(category:Category){
         return this.restaurants.count({
             where:{
-                category:category.restaurants
+                category:{
+                    id:category.id
+                }
             }
         })
     }

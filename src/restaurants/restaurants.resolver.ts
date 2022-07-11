@@ -52,8 +52,8 @@ export class CategoryResolver{
     constructor(private readonly restaurantService:RestaurantService){}
 
     @ResolveField(type => Number)
-    async restaurantCount(@Parent() category:Category):Promise<Number>{
-        return await this.restaurantService.countRestaurants(category);
+    restaurantCount(@Parent() category:Category):Promise<number>{
+        return this.restaurantService.countRestaurants(category);
     }
 
     @Query(type => AllCategoriesOuput)
