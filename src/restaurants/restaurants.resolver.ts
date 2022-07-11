@@ -9,6 +9,7 @@ import { Role } from "src/auth/role.decorator";
 import { EditProfileOutput } from "src/users/dtos/edit-profile.dto";
 import { setMaxListeners } from "process";
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto";
+import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
 
  
 @Resolver(of => Restaurant)
@@ -30,6 +31,15 @@ export class RestaurantResolver{
         @Args('input') editRestaurantInput:EditRestaurantInput
     ):Promise<EditRestaurantOutput>{
         return await this.restaurantService.editRestaurant(owner,editRestaurantInput)
+    }
+
+    @Mutation(returns => EditProfileOutput)
+    @Role(['Owner'])
+    async deleteRestaurant(
+        @AuthUser() owner:User,
+        @Args('input') deleteRestaurantInput:DeleteRestaurantInput
+    ):Promise<DeleteRestaurantOutput>{
+        return this.restaurantService.deleteRestaurant(owner,deleteRestaurantInput);
     }
 
 }
