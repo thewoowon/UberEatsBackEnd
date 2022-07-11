@@ -62,6 +62,12 @@ type AllCategoriesOuput {
   categories: [Category!]
 }
 
+type CategoryOutput {
+  error: String
+  ok: Boolean!
+  category: Category
+}
+
 type CreateAccountOutput {
   error: String
   ok: Boolean!
@@ -89,6 +95,7 @@ type Query {
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
   allCategories: AllCategoriesOuput!
+  category(slug: String!): CategoryOutput!
 }
 
 type Mutation {
