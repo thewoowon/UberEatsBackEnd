@@ -32,6 +32,7 @@ type Category {
   coverImg: String
   slug: String!
   restaurants: [Restaurant!]!
+  restaurantCount: Float!
 }
 
 type Restaurant {
@@ -53,6 +54,12 @@ type CreateRestaurantOutput {
 type EditProfileOutput {
   error: String
   ok: Boolean!
+}
+
+type AllCategoriesOuput {
+  error: String
+  ok: Boolean!
+  categories: [Category!]
 }
 
 type CreateAccountOutput {
@@ -81,6 +88,7 @@ type Query {
   users: [User!]!
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
+  allCategories: AllCategoriesOuput!
 }
 
 type Mutation {

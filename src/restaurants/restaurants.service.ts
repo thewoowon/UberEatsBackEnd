@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, RelationId, Repository } from "typeorm";
 import { Restaurant } from "./entities/restaurant.entity";
 import { CreateRestaurantInput, CreateRestaurantOutput } from "./dtos/create-restaurant.dto";
 import { User } from "src/users/entities/user.entity";
@@ -8,6 +8,7 @@ import { Category } from "./entities/category.entity";
 import { EditRestaurantInput, EditRestaurantOutput } from "./dtos/edit-restaurant.dto";
 import { CategoryRepository } from "./repositories/category.repository";
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from "./dtos/delete-restaurant.dto";
+import { AllCategoriesOuput } from "./dtos/all-categories.dto";
 
 @Injectable()
 export class RestaurantService{
@@ -112,5 +113,29 @@ export class RestaurantService{
                 error:e
             };
         }
+    }
+
+    async allCategories():Promise<AllCategoriesOuput>{
+        try{
+            const categories = await this.categories.find();
+            return {
+                ok:true,
+                categories:categories
+            }
+        }
+        catch(e){
+            return{
+                ok:false,
+                error:'Could not load categories',
+            };
+        }
+    }
+
+    countRestaurants(category:Category){
+        return this.restaurants.count({
+            where:{
+                category:category.restaurants
+            }
+        })
     }
 }
