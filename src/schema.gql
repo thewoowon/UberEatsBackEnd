@@ -66,7 +66,17 @@ type CategoryOutput {
   error: String
   ok: Boolean!
   totalPages: Int
+  totalResults: Int
+  restaurants: [Restaurant!]
   category: Category
+}
+
+type RestaurantsOutput {
+  error: String
+  ok: Boolean!
+  totalPages: Int
+  totalResults: Int
+  results: [Restaurant!]
 }
 
 type CreateAccountOutput {
@@ -95,8 +105,13 @@ type Query {
   users: [User!]!
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
+  restaurants(input: RestaurantsInput!): RestaurantsOutput!
   allCategories: AllCategoriesOuput!
   category(input: CategoryInput!): CategoryOutput!
+}
+
+input RestaurantsInput {
+  page: Int = 1
 }
 
 input CategoryInput {
