@@ -62,11 +62,11 @@ export class RestaurantResolver{
         return this.restaurantService.findRestaurantById(restaurantInput);
     }
 
-    @Query(returns => SearchRestaurantInput)
+    @Query(returns => SearchRestaurantOutput)
     searchRestaurant(
-        @Args('input') searchRestaurantInput:SearchRestaurantInput,
-    ):Promise<SearchRestaurantOutput>{
-        return this.restaurantService.searchRestaurantByName(searchRestaurantInput);
+      @Args('input') searchRestaurantInput: SearchRestaurantInput,
+    ): Promise<SearchRestaurantOutput> {
+      return this.restaurantService.searchRestaurantByName(searchRestaurantInput);
     }
 }
 
