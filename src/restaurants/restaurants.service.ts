@@ -141,13 +141,12 @@ export class RestaurantService{
             }
         })
     }
-    async findCategoryBySlug(categoryInput:CategoryInput):Promise<CategoryOutput>{
+    async findCategoryBySlug({slug,page}:CategoryInput):Promise<CategoryOutput>{
         try{
             const category = await this.categories.findOne({
                 where:{
-                    slug:categoryInput.slug
-                },
-                relations:['restaurants']
+                    slug:slug
+                },                
             });
             if(!category)
             {
@@ -156,6 +155,16 @@ export class RestaurantService{
                     error:'Category not found'
                 }
             }
+            const restaurants = await this.restaurants.find({
+                where:{
+                    category:{
+                        id:category.id
+                    }
+                },
+                take:25,
+                skip:(page-1) * 25,
+            })
+            category.restaurants = restaurants;
             return{
                 ok:true,
                 category:category
