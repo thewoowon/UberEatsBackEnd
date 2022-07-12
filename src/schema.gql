@@ -79,6 +79,12 @@ type SearchRestaurantOutput {
   restaurants: [Restaurant!]
 }
 
+type RestaurantOutput {
+  error: String
+  ok: Boolean!
+  restaurant: Restaurant
+}
+
 type CreateAccountOutput {
   error: String
   ok: Boolean!
@@ -106,6 +112,7 @@ type Query {
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
   restaurants(input: SearchRestaurantInput!): SearchRestaurantOutput!
+  restaurant(input: RestaurantInput!): RestaurantOutput!
   allCategories: AllCategoriesOuput!
   category(input: CategoryInput!): CategoryOutput!
 }
@@ -113,6 +120,10 @@ type Query {
 input SearchRestaurantInput {
   page: Int = 1
   query: String!
+}
+
+input RestaurantInput {
+  restaurantId: Int!
 }
 
 input CategoryInput {
