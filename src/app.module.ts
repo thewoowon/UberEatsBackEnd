@@ -18,6 +18,7 @@ import { MailModule } from './mail/mail.module';
 import { Category } from './restaurants/entities/category.entity';
 import { TypeOrmExModule } from './database/typeorm-ex.module';
 import { CategoryRepository } from './restaurants/repositories/category.repository';
+import { Dish } from './restaurants/entities/dish.entity';
 
 @Module({
   imports: [
@@ -53,7 +54,7 @@ import { CategoryRepository } from './restaurants/repositories/category.reposito
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !=='prod',
       logging: process.env.NODE_ENV !=='prod' && process.env.NODE_ENV ! == 'test',
-      entities:[User,Verification,Restaurant,Category]
+      entities:[User,Verification,Restaurant,Category,Dish]
     }),
     UsersModule,
     JwtModule.forRoot({

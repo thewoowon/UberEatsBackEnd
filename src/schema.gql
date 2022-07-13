@@ -35,6 +35,17 @@ type Category {
   restaurantCount: Float!
 }
 
+type Dish {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  name: String!
+  price: Int!
+  photo: String!
+  description: String!
+  restaurant: Restaurant
+}
+
 type Restaurant {
   id: Float!
   createdAt: DateTime!
@@ -44,6 +55,7 @@ type Restaurant {
   address: String!
   category: Category
   owner: User
+  menu: [Dish!]!
 }
 
 type CreateRestaurantOutput {
