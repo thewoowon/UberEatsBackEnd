@@ -11,11 +11,11 @@ class DishOption{
     @Field(type => String)
     name:string;
 
-    @Field(type => [String])
-    choices:string[];
+    @Field(type => [String],{nullable:true})
+    choices?:string[];
 
-    @Field(type => Int)
-    extra:number;
+    @Field(type => Int,{nullable:true})
+    extra?:number;
 }
 
 
@@ -49,7 +49,7 @@ export class Dish extends CoreEntity{
     @Field(type => Restaurant,{nullable:true})
     @ManyToOne(()=> Restaurant, restaurant => restaurant.menu,{nullable:false,onDelete:"CASCADE"})
     restaurant: Restaurant;
-
+    
     @RelationId((dish:Dish)=> dish.restaurant)
     restaurantId:number;
 
