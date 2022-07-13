@@ -35,15 +35,22 @@ type Category {
   restaurantCount: Float!
 }
 
+type DishOption {
+  name: String!
+  choices: [String!]!
+  extra: Int!
+}
+
 type Dish {
   id: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
   name: String!
   price: Int!
-  photo: String!
+  photo: String
   description: String!
   restaurant: Restaurant
+  options: [DishOption!]
 }
 
 type Restaurant {
@@ -164,6 +171,7 @@ type Mutation {
   createRestaurant(input: CreateRestaurantInput!): CreateRestaurantOutput!
   editRestaurant(input: EditRestaurantInput!): EditProfileOutput!
   deleteRestaurant(input: DeleteRestaurantInput!): EditProfileOutput!
+  createDish(input: CreateDishInput!): CreateAccountOutput!
 }
 
 input CreateAccountInput {
@@ -203,4 +211,18 @@ input EditRestaurantInput {
 
 input DeleteRestaurantInput {
   restaurantId: Float!
+}
+
+input CreateDishInput {
+  name: String!
+  price: Int!
+  description: String!
+  options: [DishOptionInputType!]
+  restaurantId: Int!
+}
+
+input DishOptionInputType {
+  name: String!
+  choices: [String!]!
+  extra: Int!
 }

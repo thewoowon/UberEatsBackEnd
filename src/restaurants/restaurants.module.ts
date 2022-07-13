@@ -4,7 +4,7 @@ import { TypeOrmExModule } from 'src/database/typeorm-ex.module';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
-import { CategoryResolver, RestaurantResolver } from './restaurants.resolver';
+import { CategoryResolver, DishResolver, RestaurantResolver } from './restaurants.resolver';
 import { RestaurantService } from './restaurants.service';
 
 @Module({
@@ -13,7 +13,7 @@ import { RestaurantService } from './restaurants.service';
         TypeOrmExModule.forCustomRepository([CategoryRepository]),
     ],
     controllers:[],
-    providers:[RestaurantResolver,CategoryResolver,RestaurantService]
+    providers:[RestaurantResolver,CategoryResolver,DishResolver,RestaurantService]
 })
 export class RestaurantsModule {
     
