@@ -11,6 +11,8 @@ type User {
   role: UserRole!
   verified: Boolean!
   restaurants: [Restaurant!]!
+  orders: [Order!]!
+  rides: [Order!]!
 }
 
 """
@@ -22,6 +24,25 @@ enum UserRole {
   Client
   Owner
   Delivery
+}
+
+type Order {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  customer: User
+  driver: User
+  restaurant: Restaurant!
+  dishes: [Dish!]!
+  total: Float!
+  status: OrderStatus!
+}
+
+enum OrderStatus {
+  Pending
+  Cooking
+  Picking
+  Delivered
 }
 
 type Category {
@@ -44,6 +65,7 @@ type Restaurant {
   address: String!
   category: Category
   owner: User
+  orders: [Order!]!
   menu: [Dish!]!
 }
 
@@ -117,6 +139,16 @@ type CreateAccountOutput {
   ok: Boolean!
 }
 
+type EditDishOutput {
+  error: String
+  ok: Boolean!
+}
+
+type DeleteDishOutput {
+  error: String
+  ok: Boolean!
+}
+
 type LoginOutput {
   error: String
   ok: Boolean!
@@ -172,6 +204,8 @@ type Mutation {
   editRestaurant(input: EditRestaurantInput!): EditProfileOutput!
   deleteRestaurant(input: DeleteRestaurantInput!): EditProfileOutput!
   createDish(input: CreateDishInput!): CreateAccountOutput!
+  editDish(input: EditDishInput!): EditDishOutput!
+  deleteDish(input: DeleteDishInput!): DeleteDishOutput!
 }
 
 input CreateAccountInput {
@@ -225,4 +259,16 @@ input DishOptionInputType {
   name: String!
   choices: [String!]
   extra: Int
+}
+
+input EditDishInput {
+  name: String
+  price: Int
+  description: String
+  options: [DishOptionInputType!]
+  dishId: Int!
+}
+
+input DeleteDishInput {
+  dishId: Int!
 }
