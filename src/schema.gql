@@ -26,6 +26,13 @@ enum UserRole {
   Delivery
 }
 
+type OrderItem {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  options: [DishOption!]
+}
+
 type Order {
   id: Float!
   createdAt: DateTime!
@@ -33,8 +40,8 @@ type Order {
   customer: User
   driver: User
   restaurant: Restaurant!
-  dishes: [Dish!]!
-  total: Float!
+  items: [OrderItem!]!
+  total: Float
   status: OrderStatus!
 }
 
