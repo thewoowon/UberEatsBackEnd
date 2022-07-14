@@ -16,6 +16,8 @@ import { RestaurantsInput, RestaurantsOutput } from "./dtos/restaurants.dto";
 import { CreateDishInput, CreateDishOutput } from "./dtos/create-dish.sto";
 import { create } from "domain";
 import { Dish } from "./entities/dish.entity";
+import { EditDishInput, EditDishOutput } from "./dtos/edit-dish.dto";
+import { DeleteDishInput, DeleteDishOutput } from "./dtos/delete-dish.dto";
 
 @Injectable()
 export class RestaurantService{
@@ -301,6 +303,85 @@ export class RestaurantService{
                 return {
                     ok:false,
                     error:"Could not create dish"
+                }
+            }
+        }
+
+        async checkDishOwner(ownerId:number,dishId:number){}
+
+
+        async editDish(owner:User, editDishInput:EditDishInput):Promise<EditDishOutput>{
+            try{
+                const dish = await this.dishes.findOne({
+                    where:{
+                        id:editDishInput.dishId
+                    },
+                    relations:['restaurant'],
+                });
+                if(!dish)
+                {
+                    return {
+                        ok:false,
+                        error:"Dish not Found"
+                    };
+                }
+                if(dish.restaurant.ownerId !== owner.id){
+                    return{
+                        ok:false,
+                        error:"You can't do that"
+                    };
+                }
+                await this.dishes.save([
+                    {
+                        id:editDishInput.dishId,
+                        ...editDishInput,
+                    },
+                ]);
+                return{
+                    ok:true,
+                }
+            }
+            catch(e){
+                return {
+                    ok:false,
+                    error:"Could not delete dish",
+                }
+            }
+        }
+
+        async deleteDish(
+            owner:User,
+            {dishId}:DeleteDishInput,
+        ):Promise<DeleteDishOutput>{
+            try{
+                const dish = await this.dishes.findOne({
+                    where:{
+                        id:dishId
+                    },
+                    relations:['restaurant']
+                });
+                if(!dish)
+                {
+                    return{
+                        ok:false,
+                        error:"Dish not Found",
+                    }
+                }
+                if(dish.restaurant.ownerId !== owner.id){
+                    return{
+                        ok:false,
+                        error:"You can't do that",
+                    }
+                }
+                await this.dishes.delete(dishId)
+                return {
+                    ok:true
+                }
+            }
+            catch(e){
+                return{
+                    ok:false,
+                    error:"Could not delete Dish",
                 }
             }
         }
