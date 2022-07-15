@@ -28,8 +28,7 @@ enum UserRole {
 
 type OrderItemOption {
   name: String!
-  choices: String
-  extra: Int
+  choice: String
 }
 
 type OrderItem {
@@ -305,6 +304,5 @@ input CreateOrderItemInput {
 
 input OrderItemOptionInputType {
   name: String!
-  choices: String
-  extra: Int
+  choice: String
 }
