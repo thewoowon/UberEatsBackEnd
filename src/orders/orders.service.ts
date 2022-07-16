@@ -128,13 +128,17 @@ export class OrderService{
         }
         else if(user.role === UserRole.Owner){
             const orders = await this.restaurants.find({
+                select:['orders'],
                 where:{
                     owner:{
                         id:user.id
                     }
                 },
                 relations:['orders']
-            })
+            });
+        }
+        return {
+            ok:false,
         }
     }
 }

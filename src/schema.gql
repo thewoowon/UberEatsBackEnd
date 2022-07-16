@@ -190,7 +190,9 @@ type CreateOrderOutput {
 }
 
 type GetOrdersOutput {
-  orders: [Order!]!
+  error: String
+  ok: Boolean!
+  orders: [Order!]
 }
 
 type Query {
@@ -202,7 +204,7 @@ type Query {
   searchRestaurant(input: SearchRestaurantInput!): SearchRestaurantOutput!
   allCategories: AllCategoriesOuput!
   category(input: CategoryInput!): CategoryOutput!
-  getOrders: GetOrdersOutput!
+  getOrders(input: GetOrdersInput!): GetOrdersOutput!
 }
 
 input RestaurantsInput {
@@ -221,6 +223,10 @@ input SearchRestaurantInput {
 input CategoryInput {
   page: Int = 1
   slug: String!
+}
+
+input GetOrdersInput {
+  status: OrderStatus
 }
 
 type Mutation {
