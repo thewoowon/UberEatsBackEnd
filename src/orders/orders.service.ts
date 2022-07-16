@@ -107,38 +107,50 @@ export class OrderService{
     }
 
     async getOrders(user:User,getOrdersInput:GetOrdersInput):Promise<GetOrdersOutput>{
-        if(user.role === UserRole.Client){
-            const orders = await this.orders.find({
-                where:{
-                    customer:{
-                        id:user.id
+        try{
+            let orders:Order[];
+            if(user.role === UserRole.Client){
+                orders = await this.orders.find({
+                    where:{
+                        customer:{
+                            id:user.id
+                        }
                     }
-                }
-            });
-        }
-        else if(user.role === UserRole.Delivery)
-        {
-            const orders = await this.orders.find({
-                where:{
-                    driver:{
-                        id:user.id
+                });
+            }
+            else if(user.role === UserRole.Delivery)
+            {
+                orders = await this.orders.find({
+                    where:{
+                        driver:{
+                            id:user.id
+                        }
                     }
-                }
-            });
+                });
+            }
+            else if(user.role === UserRole.Owner){
+                const restaurants = await this.restaurants.find({
+                    where:{
+                        owner:{
+                            id:user.id
+                        }
+                    },
+                    relations:['orders']
+                });
+                orders = restaurants.map(
+                    retaurant => retaurant.orders
+                ).flat(1);
+            }
+            return {
+                ok:true,
+                orders:orders
+            }
         }
-        else if(user.role === UserRole.Owner){
-            const orders = await this.restaurants.find({
-                select:['orders'],
-                where:{
-                    owner:{
-                        id:user.id
-                    }
-                },
-                relations:['orders']
-            });
-        }
-        return {
-            ok:false,
+        catch(e){
+            return{
+                ok:false,
+                error:"Could not Get Orders"
+            }
         }
     }
 }

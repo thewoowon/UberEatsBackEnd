@@ -8,8 +8,8 @@ import { Restaurant } from "./restaurant.entity";
 @ObjectType()
 export class DishChoice{
 
-    @Field(type => String)
-    name:string;
+    @Field(type => String,{nullable:true})
+    name?:string;
 
     @Field(type => Int,{nullable:true})
     extra?:number;
