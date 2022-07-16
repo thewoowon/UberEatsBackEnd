@@ -2,9 +2,10 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Dish } from "src/restaurants/entities/dish.entity";
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
-import { User } from "src/users/entities/user.entity";
+import { User, UserRole } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import { CreateOrderInput, CreateOrderOutput } from "./dtos/create-order.dto";
+import { GetOrdersInput, GetOrdersOutput } from "./dtos/get-orders.dto";
 import { OrderItem } from "./entities/order-item.entity";
 import { Order } from "./entities/order.entity";
 
@@ -102,6 +103,38 @@ export class OrderService{
                 ok: false,
                 error: 'Could not create order.',
             };
+        }
+    }
+
+    async getOrders(user:User,getOrdersInput:GetOrdersInput):Promise<GetOrdersOutput>{
+        if(user.role === UserRole.Client){
+            const orders = await this.orders.find({
+                where:{
+                    customer:{
+                        id:user.id
+                    }
+                }
+            });
+        }
+        else if(user.role === UserRole.Delivery)
+        {
+            const orders = await this.orders.find({
+                where:{
+                    driver:{
+                        id:user.id
+                    }
+                }
+            });
+        }
+        else if(user.role === UserRole.Owner){
+            const orders = await this.restaurants.find({
+                where:{
+                    owner:{
+                        id:user.id
+                    }
+                },
+                relations:['orders']
+            })
         }
     }
 }

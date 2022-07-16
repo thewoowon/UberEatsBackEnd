@@ -189,6 +189,10 @@ type CreateOrderOutput {
   ok: Boolean!
 }
 
+type GetOrdersOutput {
+  orders: [Order!]!
+}
+
 type Query {
   users: [User!]!
   me: User!
@@ -198,6 +202,7 @@ type Query {
   searchRestaurant(input: SearchRestaurantInput!): SearchRestaurantOutput!
   allCategories: AllCategoriesOuput!
   category(input: CategoryInput!): CategoryOutput!
+  getOrders: GetOrdersOutput!
 }
 
 input RestaurantsInput {
