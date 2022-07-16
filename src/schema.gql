@@ -84,7 +84,12 @@ type Restaurant {
 
 type DishChoice {
   name: String!
-  choices: [String!]
+  extra: Int
+}
+
+type DishOption {
+  name: String!
+  choices: [DishChoice!]
   extra: Int
 }
 
@@ -97,7 +102,7 @@ type Dish {
   photo: String
   description: String!
   restaurant: Restaurant
-  options: [DishChoice!]
+  options: [DishOption!]
 }
 
 type CreateRestaurantOutput {
@@ -276,7 +281,12 @@ input CreateDishInput {
 
 input DishOptionInputType {
   name: String!
-  choices: [String!]
+  choices: [DishChoiceInputType!]
+  extra: Int
+}
+
+input DishChoiceInputType {
+  name: String!
   extra: Int
 }
 
