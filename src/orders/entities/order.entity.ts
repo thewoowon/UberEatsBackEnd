@@ -11,7 +11,7 @@ export enum OrderStatus{
     Pending = 'Pending',
     Cooking = 'Cooking',
     Cooked = 'Cooked',
-    Picking = 'Picking',
+    PickedUp = 'PickedUp',
     Delivered = 'Delivered',
 }
 registerEnumType(OrderStatus,{name:'OrderStatus'});

@@ -9,7 +9,7 @@ import { GetOrderInput, GetOrderOutput } from "./dtos/get-order.dto";
 import { GetOrdersInput, GetOrdersOutput } from "./dtos/get-orders.dto";
 import { EditOrderInput, EditOrderOutput } from "./entities/edit-order.dto";
 import { OrderItem } from "./entities/order-item.entity";
-import { Order } from "./entities/order.entity";
+import { Order, OrderStatus } from "./entities/order.entity";
 
 @Injectable()
 export class OrderService{
@@ -219,6 +219,7 @@ export class OrderService{
         user:User,
         {id:orderId,status}:EditOrderInput):
         Promise<EditOrderOutput>{
+        try{
             const order = await this.orders.findOne({
                 where:{
                     id:orderId
@@ -237,8 +238,41 @@ export class OrderService{
                   error: 'You cant see that',
                 };
             }
-            if(user.role === UserRole.Owner){
-                
+            let catEdit = true;
+            if(user.role === UserRole.Client){
+                catEdit = false;
             }
+            if(user.role === UserRole.Owner){
+                if(status === OrderStatus.Cooking || status === OrderStatus.Cooked){
+                    catEdit = false;
+                }
+            }
+            if(user.role === UserRole.Delivery){
+                if(status === OrderStatus.PickedUp || status === OrderStatus.Delivered){
+                    catEdit = false;
+                }
+            }
+            if(!catEdit){
+                return{
+                    ok:false,
+                    error:"You can't do that",
+                }
+            }
+            await this.orders.save([
+                {
+                    id:orderId,
+                    status:status
+                }
+            ]);
+            return{
+                ok:true,
+            }
+        }
+        catch(e){
+            return{
+                ok:false,
+                error:"Could not edit Order."
+            }
+        }
     }
 }
