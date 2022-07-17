@@ -231,5 +231,14 @@ export class OrderService{
                     error:"Order not Found",
                 };
             }
+            if (!this.canSeeOrder(user,order)) {
+                return {
+                  ok: false,
+                  error: 'You cant see that',
+                };
+            }
+            if(user.role === UserRole.Owner){
+                
+            }
     }
 }
