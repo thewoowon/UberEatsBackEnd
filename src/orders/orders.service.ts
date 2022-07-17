@@ -7,6 +7,7 @@ import { Repository } from "typeorm";
 import { CreateOrderInput, CreateOrderOutput } from "./dtos/create-order.dto";
 import { GetOrderInput, GetOrderOutput } from "./dtos/get-order.dto";
 import { GetOrdersInput, GetOrdersOutput } from "./dtos/get-orders.dto";
+import { EditOrderInput, EditOrderOutput } from "./entities/edit-order.dto";
 import { OrderItem } from "./entities/order-item.entity";
 import { Order } from "./entities/order.entity";
 
@@ -177,20 +178,8 @@ export class OrderService{
               error: 'Order not found.',
             };
           }
-          let canSee = true;
-          if (user.role === UserRole.Client && order.customerId !== user.id) {
-            canSee = false;
-          }
-          if (user.role === UserRole.Delivery && order.driverId !== user.id) {
-            canSee = false;
-          }
-          if (
-            user.role === UserRole.Owner &&
-            order.restaurant.ownerId !== user.id
-          ) {
-            canSee = false;
-          }
-          if (!canSee) {
+          
+          if (!this.canSeeOrder(user,order)) {
             return {
               ok: false,
               error: 'You cant see that',
@@ -206,5 +195,41 @@ export class OrderService{
             error: 'Could not load order.',
           };
         }
-      }
+    }
+
+    canSeeOrder(user:User,order:Order):Boolean{
+        let canSee = true;
+          if (user.role === UserRole.Client && order.customerId !== user.id) {
+            canSee = false;
+          }
+          if (user.role === UserRole.Delivery && order.driverId !== user.id) {
+            canSee = false;
+          }
+          if (
+            user.role === UserRole.Owner &&
+            order.restaurant.ownerId !== user.id
+          ) {
+            canSee = false;
+          }
+
+          return canSee;
+    }
+
+    async editOrder(
+        user:User,
+        {id:orderId,status}:EditOrderInput):
+        Promise<EditOrderOutput>{
+            const order = await this.orders.findOne({
+                where:{
+                    id:orderId
+                },
+                relations:['restaurant']
+            })
+            if(!order){
+                return{
+                    ok:false,
+                    error:"Order not Found",
+                };
+            }
+    }
 }
