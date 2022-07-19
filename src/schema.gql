@@ -350,3 +350,7 @@ input EditOrderInput {
   id: Float!
   status: OrderStatus!
 }
+
+type Subscription {
+  orderSubscription: String!
+}

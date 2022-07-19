@@ -58,6 +58,7 @@ AppModule = __decorate([
             }),
             graphql_1.GraphQLModule.forRoot({
                 driver: apollo_1.ApolloDriver,
+                installSubscriptionHandlers: true,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
                 context: ({ req }) => ({ user: req["user"] }),
             }),
