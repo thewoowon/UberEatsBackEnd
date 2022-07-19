@@ -353,5 +353,5 @@ input EditOrderInput {
 }
 
 type Subscription {
-  coolCorn: String!
+  readyCorn: String!
 }

@@ -61,12 +61,10 @@ AppModule = __decorate([
                 installSubscriptionHandlers: true,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
                 context: ({ req, connection }) => {
-                    if (req) {
-                        return { user: req['user'] };
-                    }
-                    else {
-                        console.log(connection);
-                    }
+                    const TOKEN_KEY = 'x-jwt';
+                    return {
+                        token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY],
+                    };
                 }
             }),
             typeorm_1.TypeOrmModule.forRoot({

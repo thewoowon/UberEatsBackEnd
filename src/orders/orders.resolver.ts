@@ -54,7 +54,11 @@ export class OrderResolver{
     }
 
     @Subscription(returns => String)
-    coolCorn(){
+    @Role(['Any'])
+    readyCorn(
+        @AuthUser() user:User
+    ){
+        console.log(user);
         return pubsub.asyncIterator("coolCorn");
     }
 
