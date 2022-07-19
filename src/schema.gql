@@ -55,7 +55,7 @@ enum OrderStatus {
   Pending
   Cooking
   Cooked
-  Picking
+  PickedUp
   Delivered
 }
 

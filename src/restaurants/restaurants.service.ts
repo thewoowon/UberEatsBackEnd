@@ -293,13 +293,11 @@ export class RestaurantService{
                     ...createDishInput,
                     restaurant
                 }))
-                console.log(dish);
                 return {
                     ok:true,
                     error:""
                 }
             }catch(e){
-                console.log(e)
                 return {
                     ok:false,
                     error:"Could not create dish"

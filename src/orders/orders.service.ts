@@ -42,7 +42,6 @@ export class OrderService{
                     error:"Restaurant no Found",
                 }
             }
-
             let orderFinalPrice = 0;
             const orderItems: OrderItem[] = [];
             for (const item of items) {
@@ -60,6 +59,7 @@ export class OrderService{
                 let dishFinalPrice = dish.price;
 
                 for (const itemOption of item.options) {
+                    console.log(dish.options);
                     const dishOption = dish.options.find(
                         dishOption => dishOption.name === itemOption.name,
                     );
