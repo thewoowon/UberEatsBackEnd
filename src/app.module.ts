@@ -47,7 +47,18 @@ import { OrderItem } from './orders/entities/order-item.entity';
       driver: ApolloDriver,
       installSubscriptionHandlers:true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      context: ({req})=>({user:req["user"]}),
+      context:({
+        req,connection
+      }) =>{
+        if(req){
+          return {user:req['user']};
+        }
+        else{
+          console.log(connection);
+        }
+      }
+
+      //context: ({req})=>({user:req["user"]}),
     }),
     TypeOrmModule.forRoot({
       type: "postgres",

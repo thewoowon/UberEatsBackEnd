@@ -54,7 +54,15 @@ export class OrderResolver{
     }
 
     @Subscription(returns => String)
-    orderSubscription(){
+    coolCorn(){
         return pubsub.asyncIterator("coolCorn");
+    }
+
+    @Mutation(returns => Boolean)
+    cornReady(){
+        pubsub.publish('coolCorn',{
+            coolCorn:"Your Corn is ready!"
+        })
+        return true;
     }
 }

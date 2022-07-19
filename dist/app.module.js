@@ -60,7 +60,14 @@ AppModule = __decorate([
                 driver: apollo_1.ApolloDriver,
                 installSubscriptionHandlers: true,
                 autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
-                context: ({ req }) => ({ user: req["user"] }),
+                context: ({ req, connection }) => {
+                    if (req) {
+                        return { user: req['user'] };
+                    }
+                    else {
+                        console.log(connection);
+                    }
+                }
             }),
             typeorm_1.TypeOrmModule.forRoot({
                 type: "postgres",
