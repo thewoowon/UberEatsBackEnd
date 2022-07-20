@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { stat } from "fs";
 import { PubSub } from "graphql-subscriptions";
-import { NEW_COOKED_ORDER, NEW_PENDING_ORDER, PUB_SUB } from "src/common/common.constants";
+import { NEW_COOKED_ORDER, NEW_ORDER_UPDATE, NEW_PENDING_ORDER, PUB_SUB } from "src/common/common.constants";
 import { Dish } from "src/restaurants/entities/dish.entity";
 import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { User, UserRole } from "src/users/entities/user.entity";
@@ -231,7 +231,6 @@ export class OrderService{
                 where:{
                     id:orderId
                 },
-                relations:['restaurant']
             })
             if(!order){
                 return{
@@ -265,24 +264,21 @@ export class OrderService{
                     error:"You can't do that",
                 }
             }
-            await this.orders.save([
-                {
-                    id:orderId,
-                    status:status
-                }
-            ]);
-
             await this.orders.save({
                 id:orderId,
                 status,
             });
+            const newOrder = {...order,status};
             if(user.role === UserRole.Owner){
                 if(status === OrderStatus.Cooked){
                     await this.pubSub.publish(NEW_COOKED_ORDER,{
-                        cookedOrders:{...order,status},
+                        cookedOrders:newOrder,
                     });
                 }
             }
+            await this.pubSub.publish(NEW_ORDER_UPDATE,{
+                orderUpdates:newOrder,
+            })
             return{
                 ok:true,
             }
