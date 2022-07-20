@@ -1,9 +1,10 @@
 import { Inject } from "@nestjs/common";
 import { Args, Mutation, Resolver,Query, Subscription } from "@nestjs/graphql";
 import { PubSub } from "graphql-subscriptions";
+import { resolve } from "path";
 import { AuthUser } from "src/auth/auth-user.decorator";
 import { Role } from "src/auth/role.decorator";
-import { PUB_SUB } from "src/common/common.constants";
+import { NEW_PENDING_ORDER, PUB_SUB } from "src/common/common.constants";
 import { User } from "src/users/entities/user.entity";
 import { CreateOrderInput, CreateOrderOutput } from "./dtos/create-order.dto";
 import { GetOrderInput, GetOrderOutput } from "./dtos/get-order.dto";
@@ -56,25 +57,14 @@ export class OrderResolver{
         return this.ordersService.editOrder(user,editOrderInput);
     }
 
-    @Subscription(returns => String,{
-        filter:({readyCorn},{cornId} )=>{
-            return readyCorn === cornId;
+    @Subscription(returns => Order,{
+        filter:(payload,_,context) =>{
+            console.log(payload,context);
+            return true;
         }
     })
-    @Role(['Any'])
-    readyCorn(
-        @Args('cornId') cornId:number
-    ){
-        return this.pubSub.asyncIterator("coolCorn");
-    }
-
-    @Mutation(returns => Boolean)
-    async cornReady(
-        @Args('cornId') cornId:number
-    ){
-        await this.pubSub.publish('coolCorn',{
-            readyCorn:cornId
-        });
-        return true;
+    @Role(['Owner'])
+    pendingOrders(){
+        return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
     }
 }
