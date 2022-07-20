@@ -17,6 +17,7 @@ const config_1 = require("@nestjs/config");
 const Joi = require("joi");
 const restaurant_entity_1 = require("./restaurants/entities/restaurant.entity");
 const users_module_1 = require("./users/users.module");
+const common_module_1 = require("./common/common.module");
 const user_entity_1 = require("./users/entities/user.entity");
 const jwt_module_1 = require("./jwt/jwt.module");
 const jwt_middleware_1 = require("./jwt/jwt.middleware");
@@ -90,6 +91,7 @@ AppModule = __decorate([
             restaurants_module_1.RestaurantsModule,
             auth_module_1.AuthModule,
             orders_module_1.OrdersModule,
+            common_module_1.CommonModule
         ],
         controllers: [],
         providers: [],

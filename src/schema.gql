@@ -259,7 +259,7 @@ type Mutation {
   deleteDish(input: DeleteDishInput!): DeleteDishOutput!
   createOrder(input: CreateOrderInput!): CreateOrderOutput!
   editOrder(input: EditOrderInput!): EditOrderOutput!
-  cornReady: Boolean!
+  cornReady(cornId: Float!): Boolean!
 }
 
 input CreateAccountInput {
@@ -353,5 +353,5 @@ input EditOrderInput {
 }
 
 type Subscription {
-  readyCorn: String!
+  readyCorn(cornId: Float!): String!
 }

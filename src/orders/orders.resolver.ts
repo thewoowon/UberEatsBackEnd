@@ -56,20 +56,25 @@ export class OrderResolver{
         return this.ordersService.editOrder(user,editOrderInput);
     }
 
-    @Subscription(returns => String)
+    @Subscription(returns => String,{
+        filter:({readyCorn},{cornId} )=>{
+            return readyCorn === cornId;
+        }
+    })
     @Role(['Any'])
     readyCorn(
-        @AuthUser() user:User
+        @Args('cornId') cornId:number
     ){
-        console.log(user);
         return this.pubSub.asyncIterator("coolCorn");
     }
 
     @Mutation(returns => Boolean)
-    cornReady(){
-        this.pubSub.publish('coolCorn',{
-            coolCorn:"Your Corn is ready!"
-        })
+    async cornReady(
+        @Args('cornId') cornId:number
+    ){
+        await this.pubSub.publish('coolCorn',{
+            readyCorn:cornId
+        });
         return true;
     }
 }
