@@ -10,6 +10,7 @@ import { Repository } from "typeorm";
 import { CreateOrderInput, CreateOrderOutput } from "./dtos/create-order.dto";
 import { GetOrderInput, GetOrderOutput } from "./dtos/get-order.dto";
 import { GetOrdersInput, GetOrdersOutput } from "./dtos/get-orders.dto";
+import { TakeOrderInput, TakeOrderOutput } from "./dtos/take-order.dto";
 import { EditOrderInput, EditOrderOutput } from "./entities/edit-order.dto";
 import { OrderItem } from "./entities/order-item.entity";
 import { Order, OrderStatus } from "./entities/order.entity";
@@ -287,6 +288,47 @@ export class OrderService{
             return{
                 ok:false,
                 error:"Could not edit Order."
+            }
+        }
+    }
+
+    async takeOrder(
+        driver:User,
+        {id:orderId}:TakeOrderInput,
+    ):Promise<TakeOrderOutput>{
+        try{
+            const order = await this.orders.findOne({
+                where:{
+                    id:orderId,
+                }
+            });
+            if(!order){
+                return{
+                    ok:false,
+                    error:"Order not Found",
+                };
+            }
+            if(order.driver){
+                return{
+                    ok:false,
+                    error:"This order already has a driver",
+                };
+            }
+            await this.orders.save({
+                id:orderId,
+                driver:driver
+            });
+            await this.pubSub.publish(NEW_ORDER_UPDATE,{
+                orderUpdates:{...order,driver},
+            });
+            return{
+                ok:true
+            };
+        }
+        catch(e){
+            return{
+                ok:false,
+                error:"Could not update order",
             }
         }
     }
