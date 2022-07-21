@@ -9,9 +9,9 @@ import { Column, Entity, ManyToOne, RelationId } from "typeorm";
 @ObjectType()
 @Entity()
 export class Payment extends CoreEntity{
-    @Field(type => Int)
+    @Field(type => String)
     @Column()
-    transactionId:number;
+    transactionId:string;
     
     @Field(type => User,{nullable:true})
     @ManyToOne( // 내가 다중 대상이 하나, 나는 주문 대상은 주문자

@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Args, Mutation } from "@nestjs/graphql";
+import { Cron, Interval, SchedulerRegistry, Timeout } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AuthUser } from "src/auth/auth-user.decorator";
 import { Role } from "src/auth/role.decorator";
@@ -7,6 +8,7 @@ import { Restaurant } from "src/restaurants/entities/restaurant.entity";
 import { User } from "src/users/entities/user.entity";
 import { Repository } from "typeorm";
 import { CreatePaymentInput, CreatePaymentOutput } from "./dtos/create-payment.dto";
+import { GetPaymentsOutput } from "./dtos/get-payments.dto";
 import { Payment } from "./entities/payment.entity";
 
 @Injectable()
@@ -15,7 +17,8 @@ export class PaymentService{
         @InjectRepository(Payment)
         private readonly payments:Repository<Payment>,
         @InjectRepository(Restaurant)
-        private readonly restaurants:Repository<Restaurant>
+        private readonly restaurants:Repository<Restaurant>,
+        private schedulerRegistry:SchedulerRegistry
     ){}
     async createPayment(
         owner:User,
@@ -55,5 +58,27 @@ export class PaymentService{
                     error:"You Could not create payment"
                 }
             }
+    }
+
+    async getPayments(user:User):Promise<GetPaymentsOutput>{
+
+        try{
+            const payments = await this.payments.find({
+                where:{
+                    userId:user.id
+                }
+            });
+            return{
+                ok:true,
+                payments:payments
+            }
+        }
+        catch(e)
+        {
+            return{
+                ok:false,
+                error:"Could not load Payments."
+            }
+        }
     }
 }

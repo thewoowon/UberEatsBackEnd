@@ -24,6 +24,7 @@ import { OrdersModule } from './orders/orders.module';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { Payment } from './payments/entities/payment.entity';
       entities:[User,Verification,Restaurant,Category,Dish,Order,OrderItem,Payment]
     }),
     UsersModule,
+    ScheduleModule.forRoot(),
     JwtModule.forRoot({
       privateKey:process.env.PRIVATE_KEY
     }),

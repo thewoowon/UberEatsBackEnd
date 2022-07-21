@@ -6,7 +6,7 @@ type Payment {
   id: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
-  transactionId: Int!
+  transactionId: String!
   user: User
   restaurant: Restaurant!
   restaurantId: Int!
@@ -228,6 +228,12 @@ type CreatePaymentOutput {
   ok: Boolean!
 }
 
+type GetPaymentsOutput {
+  error: String
+  ok: Boolean!
+  payments: [Payment!]
+}
+
 type Query {
   users: [User!]!
   me: User!
@@ -239,6 +245,7 @@ type Query {
   category(input: CategoryInput!): CategoryOutput!
   getOrders(input: GetOrdersInput!): GetOrdersOutput!
   getOrder(input: GetOrderInput!): GetOrderOutput!
+  getPayments: GetPaymentsOutput!
 }
 
 input RestaurantsInput {
@@ -379,7 +386,7 @@ input TakeOrderInput {
 }
 
 input CreatePaymentInput {
-  transactionId: Int!
+  transactionId: String!
   restaurantId: Int!
 }
 

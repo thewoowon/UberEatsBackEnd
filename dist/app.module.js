@@ -31,6 +31,7 @@ const orders_module_1 = require("./orders/orders.module");
 const order_item_entity_1 = require("./orders/entities/order-item.entity");
 const payments_module_1 = require("./payments/payments.module");
 const payment_entity_1 = require("./payments/entities/payment.entity");
+const schedule_1 = require("@nestjs/schedule");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
@@ -82,6 +83,7 @@ AppModule = __decorate([
                 entities: [user_entity_1.User, verification_entity_1.Verification, restaurant_entity_1.Restaurant, category_entity_1.Category, dish_entity_1.Dish, order_entity_1.Order, order_item_entity_1.OrderItem, payment_entity_1.Payment]
             }),
             users_module_1.UsersModule,
+            schedule_1.ScheduleModule.forRoot(),
             jwt_module_1.JwtModule.forRoot({
                 privateKey: process.env.PRIVATE_KEY
             }),
