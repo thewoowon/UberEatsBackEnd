@@ -330,6 +330,7 @@ export class OrderService{
                 ok:false,
                 error:"Could not update order",
             }
+            return
         }
     }
 }
