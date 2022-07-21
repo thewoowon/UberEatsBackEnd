@@ -92,6 +92,8 @@ type Restaurant {
   owner: User
   orders: [Order!]!
   menu: [Dish!]!
+  isPromoted: Boolean!
+  promotedUntil: DateTime
 }
 
 type DishChoice {
