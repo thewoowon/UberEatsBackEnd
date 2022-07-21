@@ -8,6 +8,8 @@ type Payment {
   updatedAt: DateTime!
   transactionId: Int!
   user: User
+  restaurant: Restaurant!
+  restaurantId: Int!
 }
 
 """
