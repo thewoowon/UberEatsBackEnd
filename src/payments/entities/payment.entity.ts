@@ -19,6 +19,6 @@ export class Payment extends CoreEntity{
     )
     user?:User;
 
-    @RelationId((order:Order) => order.customer)
+    @RelationId((order:Payment) => order.user)
     userId:number;
 }

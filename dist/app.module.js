@@ -29,6 +29,8 @@ const dish_entity_1 = require("./restaurants/entities/dish.entity");
 const order_entity_1 = require("./orders/entities/order.entity");
 const orders_module_1 = require("./orders/orders.module");
 const order_item_entity_1 = require("./orders/entities/order-item.entity");
+const payments_module_1 = require("./payments/payments.module");
+const payment_entity_1 = require("./payments/entities/payment.entity");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(jwt_middleware_1.JwtMiddleware).forRoutes({
@@ -77,7 +79,7 @@ AppModule = __decorate([
                 database: process.env.DB_NAME,
                 synchronize: process.env.NODE_ENV !== 'prod',
                 logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV == 'test',
-                entities: [user_entity_1.User, verification_entity_1.Verification, restaurant_entity_1.Restaurant, category_entity_1.Category, dish_entity_1.Dish, order_entity_1.Order, order_item_entity_1.OrderItem]
+                entities: [user_entity_1.User, verification_entity_1.Verification, restaurant_entity_1.Restaurant, category_entity_1.Category, dish_entity_1.Dish, order_entity_1.Order, order_item_entity_1.OrderItem, payment_entity_1.Payment]
             }),
             users_module_1.UsersModule,
             jwt_module_1.JwtModule.forRoot({
@@ -91,7 +93,8 @@ AppModule = __decorate([
             restaurants_module_1.RestaurantsModule,
             auth_module_1.AuthModule,
             orders_module_1.OrdersModule,
-            common_module_1.CommonModule
+            common_module_1.CommonModule,
+            payments_module_1.PaymentsModule
         ],
         controllers: [],
         providers: [],
